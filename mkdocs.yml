@@ -1,0 +1,46 @@
+site_name: go-avkit docs
+site_description: "An audio/video toolkit — MP4/ISO-BMFF and Matroska/WebM demuxing."
+site_url: https://go-avkit.github.io/docs/
+repo_url: https://github.com/go-avkit
+repo_name: go-avkit
+edit_uri: ""
+
+theme:
+  name: material
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - search.suggest
+  palette:
+    # First entry has no explicit light/dark, so it is the default: follow the system.
+    - media: "(prefers-color-scheme)"
+      toggle: { icon: material/brightness-auto, name: Switch to light mode }
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: cyan
+      toggle: { icon: material/weather-night, name: Switch to dark mode }
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: cyan
+      toggle: { icon: material/brightness-auto, name: Follow the system }
+
+extra:
+  version:
+    provider: mike
+    default: latest
+
+nav:
+  - Overview: index.md
+  - Modules: modules.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - tables
+  - toc: { permalink: true }
+  - pymdownx.highlight: { anchor_linenums: true }
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
