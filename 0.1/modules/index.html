@@ -365,7 +365,7 @@
 
 
 <h1 id="modules">Modules<a class="headerlink" href="#modules" title="Permanent link">&para;</a></h1>
-<p>The 1 module of <strong>go-avkit</strong>. Each links to its source and to
+<p>The 7 modules of <strong>go-avkit</strong>. Each links to its source and to
 its generated API reference.</p>
 <table>
 <thead>
@@ -379,10 +379,41 @@ its generated API reference.</p>
 <td><a href="https://github.com/go-avkit/avkit"><code>avkit</code></a></td>
 <td><a href="https://pkg.go.dev/github.com/go-avkit/avkit">pkg.go.dev</a></td>
 </tr>
+<tr>
+<td><a href="https://github.com/go-avkit/bitstream"><code>bitstream</code></a></td>
+<td><a href="https://pkg.go.dev/github.com/go-avkit/bitstream">pkg.go.dev</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/go-avkit/boolcoder"><code>boolcoder</code></a></td>
+<td><a href="https://pkg.go.dev/github.com/go-avkit/boolcoder">pkg.go.dev</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/go-avkit/h264"><code>h264</code></a></td>
+<td><a href="https://pkg.go.dev/github.com/go-avkit/h264">pkg.go.dev</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/go-avkit/h265"><code>h265</code></a></td>
+<td><a href="https://pkg.go.dev/github.com/go-avkit/h265">pkg.go.dev</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/go-avkit/vp8"><code>vp8</code></a></td>
+<td><a href="https://pkg.go.dev/github.com/go-avkit/vp8">pkg.go.dev</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/go-avkit/vp9"><code>vp9</code></a></td>
+<td><a href="https://pkg.go.dev/github.com/go-avkit/vp9">pkg.go.dev</a></td>
+</tr>
 </tbody>
 </table>
 <p>Descriptions live on the repositories themselves rather than being copied here, so
 there is one place to correct when one changes.</p>
+<p>This table is kept by hand, and it had fallen six modules behind — it listed
+<code>avkit</code> alone while the organisation held seven. To check it, ask the
+organisation which of its repositories are Go modules:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">for</span><span class="w"> </span>r<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="k">$(</span>gh<span class="w"> </span>repo<span class="w"> </span>list<span class="w"> </span>go-avkit<span class="w"> </span>--limit<span class="w"> </span><span class="m">60</span><span class="w"> </span>--json<span class="w"> </span>name<span class="w"> </span>--jq<span class="w"> </span><span class="s1">'.[].name'</span><span class="k">)</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span>gh<span class="w"> </span>api<span class="w"> </span>repos/go-avkit/<span class="nv">$r</span>/contents/go.mod<span class="w"> </span>--jq<span class="w"> </span><span class="s1">'.name'</span><span class="w"> </span>&gt;/dev/null<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"</span><span class="nv">$r</span><span class="s2">"</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">done</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sort
+</code></pre></div>
 
 
 
