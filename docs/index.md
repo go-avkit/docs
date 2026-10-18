@@ -1,9 +1,12 @@
 # go-avkit
 
-An audio/video toolkit — MP4/ISO-BMFF and Matroska/WebM demuxing.
+An audio/video toolkit. It reads and writes MP4/ISO-BMFF, Matroska/WebM and
+MPEG-TS, and moves tracks between them without re-encoding. It also reads the
+H.264, H.265, VP8 and VP9 bitstream syntax. It is not a decoder: nothing here
+turns samples into pixels or sound.
 
 Part of the **Graphics, images & media** family of the
-[pure-Go ecosystem](https://go-desktop.github.io/) — 1 module,
+[pure-Go ecosystem](https://go-desktop.github.io/) — 7 modules,
 all `CGO_ENABLED=0`.
 
 ## What is here
