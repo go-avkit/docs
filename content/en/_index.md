@@ -6,9 +6,10 @@ weight: 10
 # go-avkit {#go-avkit}
 
 An audio/video toolkit. It reads and writes MP4/ISO-BMFF, Matroska/WebM and
-MPEG-TS, and moves tracks between them without re-encoding. It also reads the
-H.264, H.265, VP8 and VP9 bitstream syntax. It is not a decoder: nothing here
-turns samples into pixels or sound.
+MPEG-TS, reads ADTS, MP3, FLAC, Ogg, WAV and AVI, and moves tracks between them
+without re-encoding, with their subtitles (WebVTT, SRT, TTML), edit lists and
+metadata. It also reads the H.264, H.265, VP8 and VP9 bitstream syntax. It is
+not a decoder: nothing here turns samples into pixels or sound.
 
 Part of the **Graphics, images & media** family of the
 [pure-Go ecosystem](https://go-desktop.github.io/) — 7 modules,
