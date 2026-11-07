@@ -7,8 +7,9 @@ weight: 10
 
 An audio/video toolkit. It reads and writes MP4/ISO-BMFF, Matroska/WebM and
 MPEG-TS, reads ADTS, MP3, FLAC, Ogg, WAV and AVI, and moves tracks between them
-without re-encoding, with their subtitles (WebVTT, SRT, TTML), edit lists and
-metadata. It also reads the H.264, H.265, VP8 and VP9 bitstream syntax. It is
+without re-encoding, with their subtitles (WebVTT, SRT, TTML, 3GPP tx3g, and PGS
+in Matroska), edit lists and metadata. It extracts one audio track as an
+audio-only file (ADTS, MP3/MP2, FLAC, Ogg, WAV). It also reads the H.264, H.265, VP8 and VP9 bitstream syntax. It is
 not a decoder: nothing here turns samples into pixels or sound.
 
 Part of the **Graphics, images & media** family of the

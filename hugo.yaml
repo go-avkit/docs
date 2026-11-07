@@ -69,7 +69,7 @@ cascade:
 params:
   docs:
     version: "main"
-  description: "An audio/video toolkit — MP4/ISO-BMFF and Matroska/WebM demuxing."
+  description: "An audio/video toolkit — reads and writes MP4/ISO-BMFF, Matroska/WebM and MPEG-TS without re-encoding."
   navbar:
     displayTitle: true
     displayLogo: false
