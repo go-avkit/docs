@@ -9,7 +9,10 @@ An audio/video toolkit. It reads and writes MP4/ISO-BMFF, Matroska/WebM and
 MPEG-TS, reads ADTS, MP3, FLAC, Ogg, WAV and AVI, and moves tracks between them
 without re-encoding, with their subtitles (WebVTT, SRT, TTML, 3GPP tx3g, and PGS
 in Matroska), edit lists and metadata. It extracts one audio track as an
-audio-only file (ADTS, MP3/MP2, FLAC, Ogg, WAV). It also reads the H.264, H.265, VP8 and VP9 bitstream syntax. It is
+audio-only file (ADTS, MP3/MP2, FLAC, Ogg, WAV). It carries Apple Lossless
+(ALAC) and Dolby TrueHD in MP4 and Matroska (not in MPEG-TS), and reads, writes
+and carries chapters (MP4 `chpl` and QuickTime chapter track, Matroska
+`Chapters`), moved by `Cut` and `Concat`. It also reads the H.264, H.265, VP8 and VP9 bitstream syntax. It is
 not a decoder: nothing here turns samples into pixels or sound.
 
 Part of the **Graphics, images & media** family of the
