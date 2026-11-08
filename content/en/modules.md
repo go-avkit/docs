@@ -5,7 +5,7 @@ weight: 20
 
 # Modules {#modules}
 
-The 7 modules of **go-avkit**. Each links to its source and to
+The 8 modules of **go-avkit**. Each links to its source and to
 its generated API reference.
 
 | Module | Reference |
@@ -13,6 +13,7 @@ its generated API reference.
 | [`avkit`](https://github.com/go-avkit/avkit) | [pkg.go.dev](https://pkg.go.dev/github.com/go-avkit/avkit) |
 | [`bitstream`](https://github.com/go-avkit/bitstream) | [pkg.go.dev](https://pkg.go.dev/github.com/go-avkit/bitstream) |
 | [`boolcoder`](https://github.com/go-avkit/boolcoder) | [pkg.go.dev](https://pkg.go.dev/github.com/go-avkit/boolcoder) |
+| [`decode`](https://github.com/go-avkit/decode) | [pkg.go.dev](https://pkg.go.dev/github.com/go-avkit/decode) |
 | [`h264`](https://github.com/go-avkit/h264) | [pkg.go.dev](https://pkg.go.dev/github.com/go-avkit/h264) |
 | [`h265`](https://github.com/go-avkit/h265) | [pkg.go.dev](https://pkg.go.dev/github.com/go-avkit/h265) |
 | [`vp8`](https://github.com/go-avkit/vp8) | [pkg.go.dev](https://pkg.go.dev/github.com/go-avkit/vp8) |

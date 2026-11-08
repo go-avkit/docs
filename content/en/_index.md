@@ -12,11 +12,13 @@ in Matroska), edit lists and metadata. It extracts one audio track as an
 audio-only file (ADTS, MP3/MP2, FLAC, Ogg, WAV). It carries Apple Lossless
 (ALAC) and Dolby TrueHD in MP4 and Matroska (not in MPEG-TS), and reads, writes
 and carries chapters (MP4 `chpl` and QuickTime chapter track, Matroska
-`Chapters`), moved by `Cut` and `Concat`. It also reads the H.264, H.265, VP8 and VP9 bitstream syntax. It is
-not a decoder: nothing here turns samples into pixels or sound.
+`Chapters`), moved by `Cut` and `Concat`. It also reads the H.264, H.265, VP8
+and VP9 bitstream syntax. Only [`decode`]({{< relref "decode.md" >}}) turns
+samples into pictures, for a restricted set of H.264 profiles; nothing here
+decodes sound.
 
 Part of the **Graphics, images & media** family of the
-[pure-Go ecosystem](https://go-desktop.github.io/) — 7 modules,
+[pure-Go ecosystem](https://go-desktop.github.io/) — 8 modules,
 all `CGO_ENABLED=0`.
 
 ## What is here {#what-is-here}
@@ -27,6 +29,7 @@ API documentation lives. The API itself is generated from the source and served 
 duplicating it here would only create a second copy to go stale.
 
 - **[Modules]({{< relref "modules.md" >}})** — every module in go-avkit, with its source and its reference.
+- **[decode]({{< relref "decode.md" >}})** — the H.264 decoder: what it claims, what it refuses, how it was measured.
 
 ## What every module here is held to {#what-every-module-here-is-held-to}
 
