@@ -12,10 +12,17 @@ in Matroska), edit lists and metadata. It extracts one audio track as an
 audio-only file (ADTS, MP3/MP2, FLAC, Ogg, WAV). It carries Apple Lossless
 (ALAC) and Dolby TrueHD in MP4 and Matroska (not in MPEG-TS), and reads, writes
 and carries chapters (MP4 `chpl` and QuickTime chapter track, Matroska
-`Chapters`), moved by `Cut` and `Concat`. It also reads the H.264, H.265, VP8
-and VP9 bitstream syntax. Only [`decode`]({{< relref "decode.md" >}}) turns
-samples into pictures, for a restricted set of H.264 profiles; nothing here
-decodes sound.
+`Chapters`), moved by `Cut` and `Concat`. `container.Segment` (avkit v0.14.0)
+cuts a file into the initialisation and media segments of an HLS or DASH
+presentation — CMAF/fMP4 for video and audio, WebVTT documents for subtitles —
+aligned across tracks at the video keyframes; the playlists and the MPD are
+written by [go-streamkit](https://go-streamkit.github.io/)'s `hls` and `dash`
+packages (streamkit v0.1.0), and the module `github.com/go-avkit/avkit/media`
+(v0.1.0) joins the two: `media.HLS`, `media.DASH` and `media.WriteDir`. VOD
+only, one video track at most: no live, no encoding ladder, no encryption. It
+also reads the H.264, H.265, VP8 and VP9 bitstream syntax. Only
+[`decode`]({{< relref "decode.md" >}}) turns samples into pictures, for a
+restricted set of H.264 profiles; nothing here decodes sound.
 
 Part of the **Graphics, images & media** family of the
 [pure-Go ecosystem](https://go-desktop.github.io/) — 8 modules,
