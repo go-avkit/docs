@@ -17,12 +17,15 @@ cuts a file into the initialisation and media segments of an HLS or DASH
 presentation — CMAF/fMP4 for video and audio, WebVTT documents for subtitles —
 aligned across tracks at the video keyframes; the playlists and the MPD are
 written by [go-streamkit](https://go-streamkit.github.io/)'s `hls` and `dash`
-packages (streamkit v0.1.0). VOD only: no live, no encoding ladder, no
-encryption. It also reads the H.264, H.265, VP8 and VP9 bitstream syntax. It is
-not a decoder: nothing here turns samples into pixels or sound.
+packages (streamkit v0.1.0), and the module `github.com/go-avkit/avkit/media`
+(v0.1.0) joins the two: `media.HLS`, `media.DASH` and `media.WriteDir`. VOD
+only, one video track at most: no live, no encoding ladder, no encryption. It
+also reads the H.264, H.265, VP8 and VP9 bitstream syntax. Only
+[`decode`]({{< relref "decode.md" >}}) turns samples into pictures, for a
+restricted set of H.264 profiles; nothing here decodes sound.
 
 Part of the **Graphics, images & media** family of the
-[pure-Go ecosystem](https://go-desktop.github.io/) — 7 modules,
+[pure-Go ecosystem](https://go-desktop.github.io/) — 8 modules,
 all `CGO_ENABLED=0`.
 
 ## What is here {#what-is-here}
@@ -33,6 +36,7 @@ API documentation lives. The API itself is generated from the source and served 
 duplicating it here would only create a second copy to go stale.
 
 - **[Modules]({{< relref "modules.md" >}})** — every module in go-avkit, with its source and its reference.
+- **[decode]({{< relref "decode.md" >}})** — the H.264 decoder: what it claims, what it refuses, how it was measured.
 
 ## What every module here is held to {#what-every-module-here-is-held-to}
 
