@@ -40,9 +40,15 @@ jobs:
           # The whole history: each page's date comes from git.
           fetch-depth: 0
 
+      # ⛔ ONE 504 FAILED EVERY BUILD. On 2026-11-08 GitHub's release downloads
+      # answered 504 for over an hour, intermittently; a single curl failed the
+      # build of every PR and both deploys of main. Retrying on any error, for
+      # up to five minutes, rides out the intermittent part; the checksum below
+      # still refuses whatever is not the expected archive.
       - name: Install Hugo ${{ env.HUGO_VERSION }}
         run: |
-          curl -fsSL -o /tmp/hugo.tar.gz \
+          curl -fsSL --retry 8 --retry-all-errors --retry-delay 20 --retry-max-time 300 \
+            -o /tmp/hugo.tar.gz \
             "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_${HUGO_VERSION}_linux-amd64.tar.gz"
           echo "${HUGO_SHA256}  /tmp/hugo.tar.gz" | sha256sum -c -
           sudo tar -xzf /tmp/hugo.tar.gz -C /usr/local/bin hugo
