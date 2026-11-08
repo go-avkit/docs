@@ -19,7 +19,13 @@ aligned across tracks at the video keyframes; the playlists and the MPD are
 written by [go-streamkit](https://go-streamkit.github.io/)'s `hls` and `dash`
 packages (streamkit v0.1.0), and the module `github.com/go-avkit/avkit/media`
 (v0.1.0) joins the two: `media.HLS`, `media.DASH` and `media.WriteDir`. VOD
-only, one video track at most: no live, no encoding ladder, no encryption. It
+only, one video track at most: no live, no encoding ladder. Since avkit v0.15.0,
+`container.EncryptSegments` encrypts those segments with Common Encryption —
+`cenc` (AES-CTR) or `cbcs` (AES-CBC, 1:9 pattern for video) — from a key the
+caller supplies, keeping NAL and slice headers clear, and `container.Encrypt`,
+`Decrypt` and `DecryptFile` work on any fragmented MP4 (ffmpeg decrypts the
+output). There is no licence logic and no key server; stating the key in the
+HLS playlists and the DASH manifest is not yet released. It
 also reads the H.264, H.265, VP8 and VP9 bitstream syntax. Only
 [`decode`]({{< relref "decode.md" >}}) turns samples into pictures, for a
 restricted set of H.264 profiles; nothing here decodes sound.
