@@ -17,18 +17,22 @@ cuts a file into the initialisation and media segments of an HLS or DASH
 presentation — CMAF/fMP4 for video and audio, WebVTT documents for subtitles —
 aligned across tracks at the video keyframes; the playlists and the MPD are
 written by [go-streamkit](https://go-streamkit.github.io/)'s `hls` and `dash`
-packages (streamkit v0.1.0), and the module `github.com/go-avkit/avkit/media`
-(v0.1.0) joins the two: `media.HLS`, `media.DASH` and `media.WriteDir`. VOD
+packages (streamkit v0.2.0), and the module `github.com/go-avkit/avkit/media`
+(v0.2.0) joins the two: `media.HLS`, `media.DASH` and `media.WriteDir`. VOD
 only, one video track at most: no live, no encoding ladder. Since avkit v0.15.0,
 `container.EncryptSegments` encrypts those segments with Common Encryption —
 `cenc` (AES-CTR) or `cbcs` (AES-CBC, 1:9 pattern for video) — from a key the
 caller supplies, keeping NAL and slice headers clear, and `container.Encrypt`,
 `Decrypt` and `DecryptFile` work on any fragmented MP4 (ffmpeg decrypts the
-output). There is no licence logic and no key server; stating the key in the
-HLS playlists and the DASH manifest is not yet released. It
+output). With `media.Keys(...)` (media v0.2.0), `media.HLS`, `media.DASH` and
+`media.WriteDir` state how a player gets the key: `EXT-X-KEY` and
+`EXT-X-SESSION-KEY` in the HLS playlists, `ContentProtection` in the DASH
+manifest. There is no licence logic and no key server, and the content key
+itself never enters `media`. It
 also reads the H.264, H.265, VP8 and VP9 bitstream syntax. Only
-[`decode`]({{< relref "decode.md" >}}) turns samples into pictures, for a
-restricted set of H.264 profiles; nothing here decodes sound.
+[`decode`]({{< relref "decode.md" >}}) turns samples into pictures, for H.264 and
+for HEVC Main and Main 10 (4:2:0), within the limits that page states; nothing
+here decodes sound.
 
 Part of the **Graphics, images & media** family of the
 [pure-Go ecosystem](https://go-desktop.github.io/) — 8 modules,
@@ -42,7 +46,7 @@ API documentation lives. The API itself is generated from the source and served 
 duplicating it here would only create a second copy to go stale.
 
 - **[Modules]({{< relref "modules.md" >}})** — every module in go-avkit, with its source and its reference.
-- **[decode]({{< relref "decode.md" >}})** — the H.264 decoder: what it claims, what it refuses, how it was measured.
+- **[decode]({{< relref "decode.md" >}})** — the H.264 and HEVC decoder and `PosterFrame`: what it claims, what it refuses, how it was measured.
 
 ## What every module here is held to {#what-every-module-here-is-held-to}
 
