@@ -119,8 +119,8 @@ Every picture's MD5 is compared with ffmpeg's `-f framemd5`, single thread.
 - **ITU-T H.264.1 conformance suite (AVCv1):** 81 streams tried, 73 give the same
   pictures as ffmpeg. 69 do with `go.264` v1.12.0 as pinned; 4 more
   (`MR2` to `MR5_TANDBERG`) only with the upstream fix
-  [oops1/go.264#2](https://github.com/oops1/go.264/pull/2), which is not yet
-  released. The other 8 are not claimed: 5 interlaced and 3 using FMO/ASO.
+  [oops1/go.264#2](https://github.com/oops1/go.264/pull/2), which is merged
+  upstream and not yet in a release. The other 8 are not claimed: 5 interlaced and 3 using FMO/ASO.
 - **JCT-VC conformance suite HEVC_v1 (ITU-T H.265.1):** 147 streams. 143 give the
   same pictures as ffmpeg. Three are decided by the suite's own MD5 because
   ffmpeg disagrees with it and `decode` agrees with it (`SAODBLK_A_MainConcept_4`,
@@ -146,5 +146,18 @@ and `MaxTrackSamples` (default 1<<20) refuses a longer sample list.
 
 ## Speed {#speed}
 
-Not yet measured against ffmpeg, so nothing is claimed about it. It is tracked in
-[go-avkit/decode#2](https://github.com/go-avkit/decode/issues/2).
+**`decode` is slower than ffmpeg on every video input measured, and that is an open
+defect** ([go-avkit/decode#2](https://github.com/go-avkit/decode/issues/2)).
+Measured on decode v0.3.0, single core, on an Apple M4 Max with ffmpeg 9.0.2
+`-threads 1`, 5 interleaved rounds:
+
+| Input | decode (fps) | ffmpeg (fps) | decode / ffmpeg |
+| --- | --- | --- | --- |
+| H.264 High 1080p, real clip | 36.5 | 173.1 | 0.21 |
+| HEVC Main 10 2160p, real clip | 10.3 | 27.9 | 0.37 |
+| committed H.264 and HEVC streams | | | 0.21 to 0.41 |
+
+The profiles put the hot spots mostly in the wrapped libraries: `go.264` has no
+arm64 assembly kernels, and `gen2brain/h265` takes its assembly motion compensation
+at 8 bits only. The measurement is on arm64; an amd64 one is still needed. The audio
+decoders are not measured yet.
