@@ -5,13 +5,14 @@ weight: 15
 
 # decode {#decode}
 
-`github.com/go-avkit/decode` (v0.3.0) decodes **H.264** and **HEVC / H.265**
-(Main and Main 10, 4:2:0) to planar YUV, in pure Go with no cgo. H.264 is
+`github.com/go-avkit/decode` (v0.5.0) decodes **H.264** and **HEVC / H.265**
+(Main and Main 10, 4:2:0) to planar YUV and **FLAC**, **MP3** and **Opus** to
+PCM, in pure Go with no cgo. Vorbis, MP2 and AAC are not decoded. H.264 is
 decoded by [`oops1/go.264`](https://github.com/oops1/go.264) (BSD-2-Clause),
 pinned and forced onto its software path; HEVC by
 [`gen2brain/h265`](https://github.com/gen2brain/h265) v0.2.4 (MIT). `decode` is
 the avkit-facing layer around them and the place where claims are measured. It
-is the only module in this organisation that produces pictures.
+is the only module in this organisation that produces pictures or sound.
 
 ## Using it {#using-it}
 
@@ -46,6 +47,57 @@ without decoding the whole track: decoding starts at the last sync sample at or
 before the picture's sample and stops as soon as the picture is out. It takes
 H.264 (`avc1`, `avc3`) and HEVC (`hvc1`, `hev1`); another codec is
 `ErrUnsupported`. A negative or NaN `t` is `ErrTime`.
+
+## Edit lists {#edit-lists}
+
+Since v0.5.0, `DecodeTrack` and `PosterFrame` **apply an MP4 track's edit list by
+default, as ffmpeg does**: a picture presented before an edit's media time, or at
+its end or after, is decoded but not returned, presentation times are shifted so
+the pictures of the edit start at 0 (or at the length of the empty edit that delays
+the track), and `PosterFrame`'s `t` is a presentation time. **This is a change from
+v0.3.0** for a file whose edit list trims or delays the track.
+`Config.IgnoreEditList` (ffmpeg's `-ignore_editlist 1`) returns every picture
+labelled with track time, as v0.3.0 did.
+
+An edit list the package does not apply is refused with `ErrEditList` rather than
+guessed at (a media rate other than 1, an edit lasting to the end of the media, an
+empty edit after the first edit that shows media, a media time before the track).
+Matroska has no per-track video edit list, so the first picture's time is now 0, as
+in ffmpeg. **Known divergence:** for a fragmented MP4 with a trimmed start, ffmpeg
+and `decode` return different pictures (21 against 19 on the fixture), because
+ffmpeg switches its edit list support off for a fragmented file and `decode` cannot
+tell the file is fragmented yet
+([go-avkit/decode#20](https://github.com/go-avkit/decode/issues/20)).
+
+## Audio {#audio}
+
+```go
+id, _ := decode.FirstAudioTrack(r)
+pcm, err := decode.DecodeAudioTrack(r, id, decode.AudioConfig{})
+for _, a := range pcm { // presentation order, trimmed as the container states
+    use(a.Data, a.Format, a.SampleRate, a.Channels, a.Layout, a.PTS)
+}
+```
+
+`NewAudioTrack` streams it with `DecodeSample` and `Flush`. `Data` is interleaved
+little-endian PCM (`s16le`, `s32le` or `f32le`). The start of the track is dropped
+as its container states it (edit list, Opus pre-skip).
+
+| Codec | Library | Output | Checked against ffmpeg |
+| --- | --- | --- | --- |
+| FLAC | [`mewkiz/flac`](https://github.com/mewkiz/flac) | `s16le` up to 16 bits, `s32le` up to 24 | bit-exact on 13 fixtures |
+| MP3 (Layer III) | [`tphakala/go-mp3`](https://github.com/tphakala/go-mp3) | `f32le` | maximum error 1.07e-6 on 10 fixtures, sample counts equal |
+| Opus | [`pion/opus`](https://github.com/pion/opus) | `f32le`, 48 kHz | passes `opus_compare` on all 12 RFC 8251 test vectors, mono and stereo |
+
+- **FLAC:** 4 to 24 bits, 1 to 8 channels; a 32-bit stream is refused with
+  `ErrAudioUnsupported`.
+- **MP3:** MPEG-1, 2 and 2.5, mono and stereo. **MP2 (Layer II) is not decoded**
+  and is refused with `ErrAudioUnsupported`.
+- **Opus:** mono and stereo (mapping family 0); more channels (for example 5.1)
+  are refused with `ErrAudioUnsupported`. Opus is checked against the RFC 8251
+  conformance vectors, not against ffmpeg's output sample for sample.
+- **Vorbis is not decoded:** the one pure-Go decoder tried failed the comparison
+  with ffmpeg, and no decoder was written. **AAC is not decoded yet.**
 
 ## What it decodes {#what-it-decodes}
 
@@ -85,7 +137,9 @@ Every picture's MD5 is compared with ffmpeg's `-f framemd5`, single thread.
 A stream is untrusted. `Config.MaxFrameMBs` (default 36864, a 4096x2304 picture)
 and `MaxSampleBytes` (default 64 MiB) are checked before anything sized by the
 stream is allocated. Bomb tests assert a refusal under a memory limit for both
-codecs, and the parsers and sample decoders are fuzzed with a committed corpus.
+video codecs, and the parsers and sample decoders are fuzzed with a committed
+corpus. `AudioConfig` limits the channel count, the block size, a coded sample
+and the PCM a track may return.
 `PosterFrame` has bounds of its own in `PosterConfig`: `MaxSamples` (default 600)
 caps the samples decoded for one picture, past it the error is `ErrPosterLimit`,
 and `MaxTrackSamples` (default 1<<20) refuses a longer sample list.
