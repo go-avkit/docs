@@ -59,7 +59,7 @@ bytes for, or a track or the file would hold more frames than the bounds allow
 (defaults 1<<24 per track and 1<<25 per file, sized so that no file in a library
 of 30 real Matroska files is refused). `ReaderLimits`, passed to
 `NewReaderWithLimits`, `DemuxWithLimits` or `OpenFileWithLimits`, lowers them.
-The worst case at the defaults is documented in avkit's README at about 360 bytes
+The worst case at the defaults is documented in avkit's README at about 380 bytes
 allocated per input byte of one-byte laced frames; a caller with less memory
 passes lower limits. The MP4 box bound is still open
 ([go-avkit/avkit#113](https://github.com/go-avkit/avkit/issues/113)).
