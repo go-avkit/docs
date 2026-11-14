@@ -5,9 +5,10 @@ weight: 15
 
 # decode {#decode}
 
-`github.com/go-avkit/decode` (v0.5.0) decodes **H.264** and **HEVC / H.265**
+`github.com/go-avkit/decode` (latest release v0.5.4) decodes **H.264** and **HEVC / H.265**
 (Main and Main 10, 4:2:0) to planar YUV and **FLAC**, **MP3** and **Opus** to
-PCM, in pure Go with no cgo. Vorbis, MP2 and AAC are not decoded. H.264 is
+PCM, in pure Go with no cgo. Vorbis and MP2 are not decoded; [AAC](#aac) is on
+the main branch and not in a release. H.264 is
 decoded by [`oops1/go.264`](https://github.com/oops1/go.264) (BSD-2-Clause),
 pinned and forced onto its software path; HEVC by
 [`gen2brain/h265`](https://github.com/gen2brain/h265) v0.2.4 (MIT). `decode` is
@@ -97,7 +98,33 @@ as its container states it (edit list, Opus pre-skip).
   are refused with `ErrAudioUnsupported`. Opus is checked against the RFC 8251
   conformance vectors, not against ffmpeg's output sample for sample.
 - **Vorbis is not decoded:** the one pure-Go decoder tried failed the comparison
-  with ffmpeg, and no decoder was written. **AAC is not decoded yet.**
+  with ffmpeg, and no decoder was written.
+
+### AAC (on main, not yet in a release) {#aac}
+
+Everything in this section is on the `main` branch of `decode` and is **not in a
+release**: the last release, v0.5.4, does not decode AAC.
+
+- **AAC-LC**, written in Go from ISO/IEC 14496-3 (mono to 7.1, 8 to 96 kHz;
+  M/S and intensity stereo, perceptual noise substitution, TNS, pulses, short
+  windows), output `f32le`. Main, LTP, SSR, 960-sample frames, coupling channels
+  and channel configurations 11, 12 and 14 are refused with
+  `ErrAudioUnsupported`.
+- **HE-AAC v1** (SBR over AAC-LC) decodes at twice the core rate, whether the
+  AudioSpecificConfig signals it or the stream only carries it. SBR in its
+  downsampled mode is refused.
+- **Gapless:** an MP4's `iTunSMPB` item and edit lists are applied to AAC as
+  ffmpeg does. `DecodeAudioTrack` applies it, `NewAudioTrack` does not.
+- **Parametric Stereo (HE-AAC v2) is not a supported output.** The parser, the
+  hybrid filter bank and the mixing are in the tree but switched off by default;
+  a mono core that signals SBR is announced as stereo, its second channel a copy
+  of the first, until Parametric Stereo is enabled.
+- **Checked:** the error against a float64 reference of the same bitstream is
+  about half of ffmpeg's on the five fixtures; HE-AAC is within 3e-6 of ffmpeg
+  9.0.2 on four; 12 of the 15 ISO/IEC 14496-26 conformance vectors pass. Speed
+  against ffmpeg is not measured yet.
+
+The README of `decode` states each of these with its conditions.
 
 ## What it decodes {#what-it-decodes}
 

@@ -66,22 +66,68 @@ cascade:
     params:
       type: docs
 
+menu:
+  main:
+    # Navbar, left to right: version, theme, search, sources.
+    - name: Version
+      weight: 3
+      params:
+        type: partial
+        partial: components/version-select.html
+    - name: Theme
+      weight: 5
+      params:
+        type: theme-toggle
+        combo: true
+    - name: Search
+      weight: 6
+      params:
+        type: search
+    - name: GitHub
+      url: https://github.com/go-avkit
+      weight: 7
+      params:
+        icon: github
+
 params:
   docs:
     version: "main"
-  description: "An audio/video toolkit — reads and writes MP4/ISO-BMFF, Matroska/WebM and MPEG-TS without re-encoding."
+  description: "A pure-Go audio/video toolkit — reads and writes MP4/ISO-BMFF, Matroska/WebM and MPEG-TS without re-encoding, and decodes H.264, HEVC and audio."
+  versions:
+    # The version selector shows "main" with the development icon.
+    development: "main"
   navbar:
     displayTitle: true
-    displayLogo: false
+    displayLogo: true
+    logo:
+      # The mark is go-avkit/brand's svg/color/go-avkit.svg, copied verbatim.
+      path: images/brand/svg/go-avkit.svg
+      dark: images/brand/svg/go-avkit.svg
+      width: 32
+      height: 32
   theme:
     default: system
-    displayToggle: true
+    # The theme toggle is in the navbar (menu above), not at the foot of the sidebar.
+    displayToggle: false
+    # Dark Reader would darken the light theme itself; with the lock, the dark
+    # theme is our own.
+    darkreaderLock: true
   footer:
     enable: true
     displayCopyright: false
     displayPoweredBy: false
   page:
     width: normal
+    # The front matter description as a subtitle under the title.
+    displayDescription: true
+  # ⛔ The base was go-avkit/edit/main/...: no such repository, so every
+  # "Edit this page" link was a 404.
   editURL:
     enable: true
-    base: "https://github.com/go-avkit/edit/main/content/en"
+    base: "https://github.com/go-avkit/docs/edit/main/content/en"
+  search:
+    enable: true
+    type: flexsearch
+    flexsearch:
+      index: content
+      tokenize: forward

@@ -12,9 +12,13 @@ site for a pure-Go organisation.
 ## Local preview
 
 ```bash
-git submodule update --init --recursive   # themes/hextra, pinned at a release tag
+git submodule update --init --recursive   # themes/hextra, pinned at v0.24.1
 hugo server                               # http://localhost:1313
 ```
+
+The navbar mark is `go-avkit/brand`'s `svg/color/go-avkit.svg`, copied verbatim
+to `static/images/brand/svg/`; the navbar carries the version selector, the
+theme toggle, search and a link to the organisation.
 
 ## Versions
 
