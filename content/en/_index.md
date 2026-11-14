@@ -47,8 +47,22 @@ API documentation lives. The API itself is generated from the source and served 
 duplicating it here would only create a second copy to go stale.
 
 - **[Modules]({{< relref "modules.md" >}})** — every module in go-avkit, with its source and its reference.
-- **[worker](https://github.com/go-avkit/worker)** — a `js/wasm` Web Worker that answers **poster** (a JPEG of the frame at a time) and **probe** (container, codec, size, duration) requests for a page that must not link a container reader or a decoder.
+- **[worker](https://github.com/go-avkit/worker)** (v0.1.2) — a `js/wasm` Web Worker that answers **poster** (a JPEG of the frame at a time) and **probe** (container, codec, size, duration) requests for a page that must not link a container reader or a decoder.
 - **[decode]({{< relref "decode.md" >}})** — the H.264 and HEVC decoder and `PosterFrame`: what it claims, what it refuses, how it was measured.
+
+## Hostile files {#hostile-files}
+
+A media file is untrusted input. Since avkit v0.17.0, `NewReader`, `Demux` and
+`OpenFile` walk a Matroska file's block headers before anything is allocated and
+refuse it with `ErrReaderLimit` when a block states more laced frames than it has
+bytes for, or a track or the file would hold more frames than the bounds allow
+(defaults 1<<24 per track and 1<<25 per file, sized so that no file in a library
+of 30 real Matroska files is refused). `ReaderLimits`, passed to
+`NewReaderWithLimits`, `DemuxWithLimits` or `OpenFileWithLimits`, lowers them.
+The worst case at the defaults is documented in avkit's README at about 360 bytes
+allocated per input byte of one-byte laced frames; a caller with less memory
+passes lower limits. The MP4 box bound is still open
+([go-avkit/avkit#113](https://github.com/go-avkit/avkit/issues/113)).
 
 ## What every module here is held to {#what-every-module-here-is-held-to}
 
