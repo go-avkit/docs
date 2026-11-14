@@ -5,10 +5,10 @@ weight: 15
 
 # decode {#decode}
 
-`github.com/go-avkit/decode` (latest release v0.5.4) decodes **H.264** and **HEVC / H.265**
-(Main and Main 10, 4:2:0) to planar YUV and **FLAC**, **MP3** and **Opus** to
-PCM, in pure Go with no cgo. Vorbis and MP2 are not decoded; [AAC](#aac) is on
-the main branch and not in a release. H.264 is
+`github.com/go-avkit/decode` decodes **H.264** and **HEVC / H.265**
+(Main and Main 10, 4:2:0) to planar YUV and **FLAC**, **MP3**, **Opus** and,
+since v0.6.0, [**AAC**](#aac) to PCM, in pure Go with no cgo. Vorbis and MP2 are
+not decoded. H.264 is
 decoded by [`oops1/go.264`](https://github.com/oops1/go.264) (BSD-2-Clause),
 pinned and forced onto its software path; HEVC by
 [`gen2brain/h265`](https://github.com/gen2brain/h265) v0.2.4 (MIT). `decode` is
@@ -100,10 +100,9 @@ as its container states it (edit list, Opus pre-skip).
 - **Vorbis is not decoded:** the one pure-Go decoder tried failed the comparison
   with ffmpeg, and no decoder was written.
 
-### AAC (on main, not yet in a release) {#aac}
+### AAC (since v0.6.0) {#aac}
 
-Everything in this section is on the `main` branch of `decode` and is **not in a
-release**: the last release, v0.5.4, does not decode AAC.
+AAC is available since decode v0.6.0; v0.5.4 and earlier do not decode it.
 
 - **AAC-LC**, written in Go from ISO/IEC 14496-3 (mono to 7.1, 8 to 96 kHz;
   M/S and intensity stereo, perceptual noise substitution, TNS, pulses, short
@@ -116,15 +115,26 @@ release**: the last release, v0.5.4, does not decode AAC.
 - **Gapless:** an MP4's `iTunSMPB` item and edit lists are applied to AAC as
   ffmpeg does. `DecodeAudioTrack` applies it, `NewAudioTrack` does not.
 - **Parametric Stereo (HE-AAC v2) is not a supported output.** The parser, the
-  hybrid filter bank and the mixing are in the tree but switched off by default;
+  hybrid filter bank and the mixing are implemented but switched off by default;
   a mono core that signals SBR is announced as stereo, its second channel a copy
   of the first, until Parametric Stereo is enabled.
 - **Checked:** the error against a float64 reference of the same bitstream is
   about half of ffmpeg's on the five fixtures; HE-AAC is within 3e-6 of ffmpeg
-  9.0.2 on four; 12 of the 15 ISO/IEC 14496-26 conformance vectors pass. Speed
-  against ffmpeg is not measured yet.
+  9.0.2 on four; 12 of the 15 ISO/IEC 14496-26 conformance vectors pass.
 
-The README of `decode` states each of these with its conditions.
+Speed ([go-avkit/decode#35](https://github.com/go-avkit/decode/issues/35)): a
+decode-only benchmark (`BenchmarkAACDecodeReuse`, one core) against the median
+`utime` of ffmpeg 9.0.2 `-threads 1`, which is a **whole process** that also
+opens and demuxes the file. Go 1.27.4, Apple M4 Max, 10-minute inputs, five
+interleaved rounds at 1-minute load 6.02 to 6.46:
+
+| Input | decode (ms) | ffmpeg utime (ms) | decode / ffmpeg |
+| --- | --- | --- | --- |
+| 5.1, 48 kHz | 793.4 | 821 | 0.966 |
+| stereo, 48 kHz | 309.0 | 472 | 0.655 |
+
+Mono was not measured. The README of `decode` states each of these with its
+conditions.
 
 ## What it decodes {#what-it-decodes}
 
