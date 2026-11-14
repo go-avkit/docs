@@ -5,7 +5,7 @@ weight: 20
 
 # Modules {#modules}
 
-The 8 modules of **go-avkit**. Each links to its source and to
+The 9 modules of **go-avkit**. Each links to its source and to
 its generated API reference.
 
 | Module | Reference |
@@ -18,6 +18,7 @@ its generated API reference.
 | [`h265`](https://github.com/go-avkit/h265) | [pkg.go.dev](https://pkg.go.dev/github.com/go-avkit/h265) |
 | [`vp8`](https://github.com/go-avkit/vp8) | [pkg.go.dev](https://pkg.go.dev/github.com/go-avkit/vp8) |
 | [`vp9`](https://github.com/go-avkit/vp9) | [pkg.go.dev](https://pkg.go.dev/github.com/go-avkit/vp9) |
+| [`worker`](https://github.com/go-avkit/worker) | [pkg.go.dev](https://pkg.go.dev/github.com/go-avkit/worker) |
 
 Descriptions live on the repositories themselves rather than being copied here, so
 there is one place to correct when one changes.
