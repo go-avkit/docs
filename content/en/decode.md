@@ -103,8 +103,7 @@ as its container states it (edit list, Opus pre-skip).
 ### AAC (on main, not yet in a release) {#aac}
 
 Everything in this section is on the `main` branch of `decode` and is **not in a
-release**: the last release, v0.5.4, does not decode AAC. A release waits on
-speed parity with ffmpeg for 5.1 streams.
+release**: the last release, v0.5.4, does not decode AAC.
 
 - **AAC-LC**, written in Go from ISO/IEC 14496-3 (mono to 7.1, 8 to 96 kHz;
   M/S and intensity stereo, perceptual noise substitution, TNS, pulses, short
