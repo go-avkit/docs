@@ -6,8 +6,7 @@ weight: 15
 # decode {#decode}
 
 `github.com/go-avkit/decode` decodes **H.264** and **HEVC / H.265**
-(Main and Main 10, 4:2:0) to planar YUV and **FLAC**, **MP3**, **Opus** and,
-since v0.6.0, [**AAC**](#aac) to PCM, in pure Go with no cgo. Vorbis and MP2 are
+(Main and Main 10, 4:2:0) to planar YUV and **FLAC**, **MP3**, **Opus**, since v0.6.0, [**AAC**](#aac) and, since v0.9.0, linear PCM (WAVE) to PCM, in pure Go with no cgo. Vorbis and MP2 are
 not decoded. H.264 is
 decoded by [`oops1/go.264`](https://github.com/oops1/go.264) (BSD-2-Clause),
 pinned and forced onto its software path; HEVC by
@@ -46,8 +45,9 @@ f, err := decode.PosterFrame(r, id, 12.5, decode.PosterConfig{})
 presentation time at or before `t`, the very bytes `DecodeTrack` returns for it,
 without decoding the whole track: decoding starts at the last sync sample at or
 before the picture's sample and stops as soon as the picture is out. It takes
-H.264 (`avc1`, `avc3`) and HEVC (`hvc1`, `hev1`); another codec is
-`ErrUnsupported`. A negative or NaN `t` is `ErrTime`.
+H.264 (`avc1`, `avc3`) and HEVC (`hvc1`, `hev1`); another codec (VP8, VP9, AV1, ...) is refused by name, since v0.9.0,
+with a `*CodecError` (`codec "vp09" is not supported`; `errors.Is(err,
+ErrUnsupported)` holds), not reported as a corrupt sample. A negative or NaN `t` is `ErrTime`.
 
 ## Edit lists {#edit-lists}
 
@@ -89,6 +89,10 @@ as its container states it (edit list, Opus pre-skip).
 | FLAC | [`mewkiz/flac`](https://github.com/mewkiz/flac) | `s16le` up to 16 bits, `s32le` up to 24 | bit-exact on 13 fixtures |
 | MP3 (Layer III) | [`tphakala/go-mp3`](https://github.com/tphakala/go-mp3) | `f32le` | maximum error 1.07e-6 on 10 fixtures, sample counts equal |
 | Opus | [`pion/opus`](https://github.com/pion/opus) | `f32le`, 48 kHz | passes `opus_compare` on all 12 RFC 8251 test vectors, mono and stereo |
+| Linear PCM (WAVE; `ipcm`, `fpcm`, `raw `), since v0.9.0 | this package | `s16le`, `s32le` or `f32le` | bit-exact on 6 WAVE fixtures (s16, s24, s32, f32, f64, u8); 64-bit float is rounded to `f32le`, which is lossy |
+
+Linear PCM takes its width and byte order from the `pcmC` record of the track's
+sample entry; an entry without the record is `ErrAudioConfig`.
 
 - **FLAC:** 4 to 24 bits, 1 to 8 channels; a 32-bit stream is refused with
   `ErrAudioUnsupported`.
