@@ -103,6 +103,7 @@ as its container states it (edit list, Opus pre-skip).
 ### AAC (since v0.6.0) {#aac}
 
 AAC is available since decode v0.6.0; v0.5.4 and earlier do not decode it.
+HE-AAC v2 follows in v0.7.0.
 
 - **AAC-LC**, written in Go from ISO/IEC 14496-3 (mono to 7.1, 8 to 96 kHz;
   M/S and intensity stereo, perceptual noise substitution, TNS, pulses, short
@@ -114,10 +115,14 @@ AAC is available since decode v0.6.0; v0.5.4 and earlier do not decode it.
   downsampled mode is refused.
 - **Gapless:** an MP4's `iTunSMPB` item and edit lists are applied to AAC as
   ffmpeg does. `DecodeAudioTrack` applies it, `NewAudioTrack` does not.
-- **Parametric Stereo (HE-AAC v2) is not a supported output.** The parser, the
-  hybrid filter bank and the mixing are implemented but switched off by default;
-  a mono core that signals SBR is announced as stereo, its second channel a copy
-  of the first, until Parametric Stereo is enabled.
+- **HE-AAC v2 (Parametric Stereo) is supported since v0.7.0**, with baseline
+  mixing: procedure A for every ICC mode, IPD/OPD ignored, and 34-band streams
+  keep 34 bands (a baseline decoder maps them to 20, so one ISO vector,
+  `al_sbr_ps_06`, matches its unrestricted reference but not its baseline one,
+  2226 LSB off). A mono core that signals SBR is announced as stereo from the
+  first frame; the full profile (procedure B, IPD/OPD) is later work. Checked:
+  7 of 7 ISO PS vectors at 0.033 LSB, and 801 mono PS files of the author's
+  library within 1.1e-5 of ffmpeg 9.0.2.
 - **Checked:** the error against a float64 reference of the same bitstream is
   about half of ffmpeg's on the five fixtures; HE-AAC is within 3e-6 of ffmpeg
   9.0.2 on four; 12 of the 15 ISO/IEC 14496-26 conformance vectors pass.
@@ -132,6 +137,12 @@ interleaved rounds at 1-minute load 6.02 to 6.46:
 | --- | --- | --- | --- |
 | 5.1, 48 kHz | 793.4 | 821 | 0.966 |
 | stereo, 48 kHz | 309.0 | 472 | 0.655 |
+
+**HE-AAC v2 is slower than ffmpeg: about 1.4 to 1.5 times its `utime`** on one
+core, an open defect ([go-avkit/decode#77](https://github.com/go-avkit/decode/issues/77)).
+Same method, a 620 s HE-AAC v2 file: 1.37 at a 1-minute load of 1.6 and 1.45 to
+1.47 at a load of 6 to 7, so the ratio moves with the machine's load. It was 1.74
+before the speed work.
 
 Mono was not measured. The README of `decode` states each of these with its
 conditions.
