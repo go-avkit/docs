@@ -33,7 +33,7 @@ also reads the H.264, H.265, VP8 and VP9 bitstream syntax. Only
 [`decode`]({{< relref "decode.md" >}}) turns samples into pictures, for H.264 and
 for HEVC Main and Main 10 (4:2:0), within the limits that page states; nothing
 here decodes sound except `decode`'s FLAC, MP3, Opus and, since decode v0.6.0,
-AAC-LC and HE-AAC v1 and, since v0.7.0, HE-AAC v2 (not Vorbis or MP2).
+AAC-LC and HE-AAC v1 and, since v0.7.0, HE-AAC v2 (full profile since v0.8.0; not Vorbis or MP2).
 
 Part of the **Graphics, images & media** family of the
 [pure-Go ecosystem](https://go-desktop.github.io/) — 9 modules,

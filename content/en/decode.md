@@ -103,7 +103,7 @@ as its container states it (edit list, Opus pre-skip).
 ### AAC (since v0.6.0) {#aac}
 
 AAC is available since decode v0.6.0; v0.5.4 and earlier do not decode it.
-HE-AAC v2 follows in v0.7.0.
+HE-AAC v2 follows in v0.7.0, with its full profile by default in v0.8.0.
 
 - **AAC-LC**, written in Go from ISO/IEC 14496-3 (mono to 7.1, 8 to 96 kHz;
   M/S and intensity stereo, perceptual noise substitution, TNS, pulses, short
@@ -115,14 +115,16 @@ HE-AAC v2 follows in v0.7.0.
   downsampled mode is refused.
 - **Gapless:** an MP4's `iTunSMPB` item and edit lists are applied to AAC as
   ffmpeg does. `DecodeAudioTrack` applies it, `NewAudioTrack` does not.
-- **HE-AAC v2 (Parametric Stereo) is supported since v0.7.0**, with baseline
-  mixing: procedure A for every ICC mode, IPD/OPD ignored, and 34-band streams
-  keep 34 bands (a baseline decoder maps them to 20, so one ISO vector,
-  `al_sbr_ps_06`, matches its unrestricted reference but not its baseline one,
-  2226 LSB off). A mono core that signals SBR is announced as stereo from the
-  first frame; the full profile (procedure B, IPD/OPD) is later work. Checked:
-  7 of 7 ISO PS vectors at 0.033 LSB, and 801 mono PS files of the author's
-  library within 1.1e-5 of ffmpeg 9.0.2.
+- **HE-AAC v2 (Parametric Stereo) is supported since v0.7.0, and the full
+  profile is the default since v0.8.0**: procedure B for ICC modes 3 to 5, and
+  IPD/OPD with their smoothing and interpolation, as the `_ur` references of
+  ISO's vectors are. 34-band streams keep 34 bands (a baseline decoder maps them
+  to 20, so one ISO vector, `al_sbr_ps_06`, matches its `_ur` reference but not
+  its baseline one, 2226 LSB off). v0.7.0 mixed with baseline mixing only
+  (procedure A, IPD/OPD ignored). A mono core that signals SBR is announced as
+  stereo from the first frame. Checked: all 7 of 7 ISO PS vectors match the
+  `_ur` references at 0.033 LSB, and 801 mono PS files of the author's library
+  are within 1.1e-5 of ffmpeg 9.0.2.
 - **Checked:** the error against a float64 reference of the same bitstream is
   about half of ffmpeg's on the five fixtures; HE-AAC is within 3e-6 of ffmpeg
   9.0.2 on four; 12 of the 15 ISO/IEC 14496-26 conformance vectors pass.
@@ -138,11 +140,21 @@ interleaved rounds at 1-minute load 6.02 to 6.46:
 | 5.1, 48 kHz | 793.4 | 821 | 0.966 |
 | stereo, 48 kHz | 309.0 | 472 | 0.655 |
 
-**HE-AAC v2 is slower than ffmpeg: about 1.4 to 1.5 times its `utime`** on one
-core, an open defect ([go-avkit/decode#77](https://github.com/go-avkit/decode/issues/77)).
-Same method, a 620 s HE-AAC v2 file: 1.37 at a 1-minute load of 1.6 and 1.45 to
-1.47 at a load of 6 to 7, so the ratio moves with the machine's load. It was 1.74
-before the speed work.
+**HE-AAC v2 is slower than ffmpeg on one core: about 1.6 times its `utime` on
+an x86 server core and about 1.1 times on an Apple M4**, an open defect
+([go-avkit/decode#77](https://github.com/go-avkit/decode/issues/77)). Same
+method, a 620 s HE-AAC v2 file, as measured for v0.8.0 (Go 1.27.4, interleaved
+rounds, one row per machine):
+
+| Machine, date | decode / ffmpeg | 1-minute load | ffmpeg |
+| --- | --- | --- | --- |
+| AMD Ryzen 9 7950X (Zen 4), Ubuntu 24.04, 2026-11-15 | 1.62 (1.60 to 1.65 in three runs) | 0.13 to 0.93 | 6.1.1 |
+| Apple M4 Max, 2026-11-15, indicative | 1.11 | 7.0 to 7.7 | 9.0.2 |
+
+The two ffmpeg versions differ, so the rows do not compare the machines. The M4
+ratio is at a load just under the gate and moves with it (1.37 to 1.47 earlier
+at a load of 1.6 and 6 to 7). It was 1.74 on the M4 before the speed work of
+v0.8.0.
 
 Mono was not measured. The README of `decode` states each of these with its
 conditions.
