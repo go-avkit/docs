@@ -48,6 +48,21 @@ not use it, so it still wraps a third-party decoder for HEVC. Nothing
 here decodes sound except `decode`'s FLAC, MP3, Opus and, since decode v0.6.0,
 AAC-LC and HE-AAC v1 and, since v0.7.0, HE-AAC v2 (full profile since v0.8.0; not Vorbis or MP2).
 
+`h265` speed (v0.17.0, from its
+[README](https://github.com/go-avkit/h265#speed)): frames per second by CPU time,
+one core (AMD Ryzen 9 7950X, `taskset`, interleaved rounds, load 0.5 to 3,
+2026-11-16). The third-party decoder is the one `decode` v0.9.0 uses for HEVC,
+measured through `DecodeTrack`; ffmpeg is 6.1.1 with `-threads 1`. No parity is
+claimed: it is slower than the third-party decoder on 8-bit streams (an open
+defect) and far slower than ffmpeg.
+
+| stream (1080p, 240 or 120 frames) | v0.16.0 | v0.17.0 | third-party | ffmpeg |
+| --- | --- | --- | --- | --- |
+| alien, Main | 13.5 | 34.5 | 88 | 396 |
+| fade, Main | 13.8 | 36.7 | 80 | 427 |
+| alien, Main 10 | 13.3 | 35.5 | 30.0 | 300 |
+| alien8 | 15.4 | 38.3 | 95 | 430 |
+
 Part of the **Graphics, images & media** family of the
 [pure-Go ecosystem](https://go-desktop.github.io/) — 9 modules,
 all `CGO_ENABLED=0`.
