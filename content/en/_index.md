@@ -37,7 +37,13 @@ since v0.15.0: 7147 hashed conformance pictures verified (6638 inter), 0
 mismatched; the 3091 pictures of the 59 hashless streams are unverified
 (h265#48). Since v0.16.0 it has a public `Decoder` API (Decode and Flush, pictures in output
 order, typed errors, limits on picture size and memory); v0.14.0 and v0.15.0 could
-panic on a hostile SPS, fixed in v0.16.0. `decode` does
+panic on a hostile SPS, fixed in v0.16.0. v0.17.0 is 2.6 times faster with the
+output unchanged, and is still slower than the third-party decoder on 8-bit streams
+(an open defect) and far slower than ffmpeg. On one core of an AMD Ryzen 9 7950X
+(load 0.5 to 3, 2026-11-16, ffmpeg 6.1.1 with one thread, 1080p, frames per second
+by CPU time): alien, Main 34.5 against 88 for the third-party decoder and 396 for
+ffmpeg; alien, Main 10 35.5 against 30.0 and 300, the one case where it is faster
+than the third-party decoder. `decode` does
 not use it, so it still wraps a third-party decoder for HEVC. Nothing
 here decodes sound except `decode`'s FLAC, MP3, Opus and, since decode v0.6.0,
 AAC-LC and HE-AAC v1 and, since v0.7.0, HE-AAC v2 (full profile since v0.8.0; not Vorbis or MP2).
