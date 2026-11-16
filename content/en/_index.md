@@ -37,31 +37,31 @@ since v0.15.0: 7147 hashed conformance pictures verified (6638 inter), 0
 mismatched; the 3091 pictures of the 59 hashless streams are unverified
 (h265#48). Since v0.16.0 it has a public `Decoder` API (Decode and Flush, pictures in output
 order, typed errors, limits on picture size and memory); v0.14.0 and v0.15.0 could
-panic on a hostile SPS, fixed in v0.16.0. v0.17.0 is 2.6 times faster with the
-output unchanged, and is still slower than the third-party decoder on 8-bit streams
-(an open defect) and far slower than ffmpeg. On one core of an AMD Ryzen 9 7950X
-(load 0.5 to 3, 2026-11-16, ffmpeg 6.1.1 with one thread, 1080p, frames per second
-by CPU time): alien, Main 34.5 against 88 for the third-party decoder and 396 for
-ffmpeg; alien, Main 10 35.5 against 30.0 and 300, the one case where it is faster
-than the third-party decoder. `decode` does
+panic on a hostile SPS, fixed in v0.16.0. v0.18.0 runs the HEVC kernels
+of go-videodsp/kernels with the output unchanged, and is still slower than the
+third-party decoder on 8-bit streams (an open defect) and far slower than ffmpeg.
+On one core of an AMD Ryzen 9 7950X (load about 1, 2026-11-16, ffmpeg 6.1.1 with one
+thread, 1080p, frames per second by CPU time): alien, Main 58.3 against 88.0 for the
+third-party decoder and 397 for ffmpeg; alien, Main 10 60.4 against 30.1 and 306,
+twice as fast as the third-party decoder. `decode` does
 not use it, so it still wraps a third-party decoder for HEVC. Nothing
 here decodes sound except `decode`'s FLAC, MP3, Opus and, since decode v0.6.0,
 AAC-LC and HE-AAC v1 and, since v0.7.0, HE-AAC v2 (full profile since v0.8.0; not Vorbis or MP2).
 
-`h265` speed (v0.17.0, from its
+`h265` speed (v0.18.0, from its
 [README](https://github.com/go-avkit/h265#speed)): frames per second by CPU time,
-one core (AMD Ryzen 9 7950X, `taskset`, interleaved rounds, load 0.5 to 3,
+one core (AMD Ryzen 9 7950X, `taskset -c 5`, interleaved rounds, load about 1,
 2026-11-16). The third-party decoder is the one `decode` v0.9.0 uses for HEVC,
 measured through `DecodeTrack`; ffmpeg is 6.1.1 with `-threads 1`. No parity is
 claimed: it is slower than the third-party decoder on 8-bit streams (an open
 defect) and far slower than ffmpeg.
 
-| stream (1080p, 240 or 120 frames) | v0.16.0 | v0.17.0 | third-party | ffmpeg |
+| stream (1080p) | v0.17.0 | v0.18.0 | third-party | ffmpeg |
 | --- | --- | --- | --- | --- |
-| alien, Main | 13.5 | 34.5 | 88 | 396 |
-| fade, Main | 13.8 | 36.7 | 80 | 427 |
-| alien, Main 10 | 13.3 | 35.5 | 30.0 | 300 |
-| alien8 | 15.4 | 38.3 | 95 | 430 |
+| alien, Main | 34.5 | 58.3 | 88.0 | 397 |
+| fade, Main | 36.7 | 53.8 | 80.4 | 436 |
+| alien, Main 10 | 35.5 | 60.4 | 30.1 | 306 |
+| alien8 | 38.3 | 66.6 | 96.0 | 438 |
 
 Part of the **Graphics, images & media** family of the
 [pure-Go ecosystem](https://go-desktop.github.io/) — 9 modules,
