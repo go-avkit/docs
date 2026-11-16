@@ -35,7 +35,9 @@ for HEVC Main and Main 10 (4:2:0), within the limits that page states. `h265`
 carries a decoder of our own since v0.14.0 and reconstructs inter prediction
 since v0.15.0: 7147 hashed conformance pictures verified (6638 inter), 0
 mismatched; the 3091 pictures of the 59 hashless streams are unverified
-(h265#48). It has no public decoder API yet and `decode` does
+(h265#48). Since v0.16.0 it has a public `Decoder` API (Decode and Flush, pictures in output
+order, typed errors, limits on picture size and memory); v0.14.0 and v0.15.0 could
+panic on a hostile SPS, fixed in v0.16.0. `decode` does
 not use it, so it still wraps a third-party decoder for HEVC. Nothing
 here decodes sound except `decode`'s FLAC, MP3, Opus and, since decode v0.6.0,
 AAC-LC and HE-AAC v1 and, since v0.7.0, HE-AAC v2 (full profile since v0.8.0; not Vorbis or MP2).
