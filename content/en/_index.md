@@ -32,8 +32,10 @@ itself never enters `media`. It
 also reads the H.264, H.265, VP8 and VP9 bitstream syntax. Only
 [`decode`]({{< relref "decode.md" >}}) turns samples into pictures, for H.264 and
 for HEVC Main and Main 10 (4:2:0), within the limits that page states. `h265`
-v0.14.0 begins a decoder of our own (full slice-data syntax, intra pictures with
-deblocking and SAO, the DPB); inter is not reconstructed yet and `decode` does
+carries a decoder of our own since v0.14.0 and reconstructs inter prediction
+since v0.15.0: 7147 hashed conformance pictures verified (6638 inter), 0
+mismatched; the 3091 pictures of the 59 hashless streams are unverified
+(h265#48). It has no public decoder API yet and `decode` does
 not use it, so it still wraps a third-party decoder for HEVC. Nothing
 here decodes sound except `decode`'s FLAC, MP3, Opus and, since decode v0.6.0,
 AAC-LC and HE-AAC v1 and, since v0.7.0, HE-AAC v2 (full profile since v0.8.0; not Vorbis or MP2).
