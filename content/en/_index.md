@@ -40,7 +40,14 @@ order, typed errors, limits on picture size and memory); v0.14.0 and v0.15.0 cou
 panic on a hostile SPS, fixed in v0.16.0. v0.20.0 is faster than the
 previous third-party decoder on every stream measured on x86 (1.03 to 1.09 times on
 8-bit, 3.07 on Main 10) and still 0.19 to 0.30 of ffmpeg's speed, an open defect;
-v0.21.0 adds `Unit.Tag`, carried to `Output.Tag`.
+v0.21.0 adds `Unit.Tag`, carried to `Output.Tag`. v0.22.0 decodes 8-bit pictures
+natively into bytes, with the output unchanged (md5 equal to ffmpeg's): on one pinned
+Zen 4 core, against v0.21.0, alien Main 91.1 to 107.6 fps (+18 %), fade Main 82.2 to
+95.3 (+16 %), alien8 103.9 to 125.7 (+21 %), Main 10 unchanged; on an Apple M4
+(indicative) +1 to +8 %. **Behaviour change in v0.22.0:** `Plane.Pix` is renamed
+`Pix16`, with no alias, and an 8-bit picture carries `Pix8 []uint8` instead (exactly
+one of the two is non-nil; `Is8`, `At` and `Len` read either). `decode` still pins
+v0.21.0.
 **Behaviour change in v0.19.0:** the planes of a picture from `Decoder.Output` are
 read-only views, not copies, and `Stride` can exceed `Width`; a caller that modifies
 samples must call `Clone()` first. Since `decode` v0.10.0, `decode` decodes HEVC with
