@@ -37,34 +37,55 @@ since v0.15.0: 7147 hashed conformance pictures verified (6638 inter), 0
 mismatched; the 3091 pictures of the 59 hashless streams are unverified
 (h265#48). Since v0.16.0 it has a public `Decoder` API (Decode and Flush, pictures in output
 order, typed errors, limits on picture size and memory); v0.14.0 and v0.15.0 could
-panic on a hostile SPS, fixed in v0.16.0. v0.19.0 runs more of the HEVC
-kernels of go-videodsp/kernels with the output unchanged, and is still slower than
-the third-party decoder on 8-bit streams (0.86 to 0.90 of its speed, an open defect)
-and far slower than ffmpeg. On one core of an AMD Ryzen 9 7950X (load 0.15 to 1.06,
-2026-11-16, ffmpeg 6.1.1 with one thread, 1080p, frames per second by CPU time):
-alien, Main 76.1 against 87.4 for the third-party decoder and 395 for ffmpeg; alien,
-Main 10 79.3 against 30.0 and 303, 2.6 times as fast as the third-party decoder.
+panic on a hostile SPS, fixed in v0.16.0. v0.20.0 is faster than the
+previous third-party decoder on every stream measured on x86 (1.03 to 1.09 times on
+8-bit, 3.07 on Main 10) and still 0.19 to 0.30 of ffmpeg's speed, an open defect;
+v0.21.0 adds `Unit.Tag`, carried to `Output.Tag`.
 **Behaviour change in v0.19.0:** the planes of a picture from `Decoder.Output` are
 read-only views, not copies, and `Stride` can exceed `Width`; a caller that modifies
-samples must call `Clone()` first. `decode` does
-not use it, so it still wraps a third-party decoder for HEVC. Nothing
+samples must call `Clone()` first. Since `decode` v0.10.0, `decode` decodes HEVC with
+`h265` (gen2brain/h265 is gone); on x86 its 8-bit streams are 7 to 12 % slower than
+v0.9.0, an open defect (decode#101), and Main 10 is 2.5 times faster. Nothing
 here decodes sound except `decode`'s FLAC, MP3, Opus and, since decode v0.6.0,
 AAC-LC and HE-AAC v1 and, since v0.7.0, HE-AAC v2 (full profile since v0.8.0; not Vorbis or MP2).
 
-`h265` speed (v0.19.0, from its
+`h265` speed (v0.20.0, from its
 [README](https://github.com/go-avkit/h265#speed)): frames per second by CPU time,
-one core (AMD Ryzen 9 7950X, `taskset -c 5`, four runs of five rounds interleaved,
-load 0.15 to 1.06, 2026-11-16). The third-party decoder is the one `decode` v0.9.0 uses for HEVC,
+one core (AMD Ryzen 9 7950X, `taskset -c 5`, ABBA of five rounds each, load 0.44 to
+1.21, 2026-11-16). "Third-party" is gen2brain/h265, the decoder `decode` v0.9.0 used,
 measured through `DecodeTrack`; ffmpeg is 6.1.1 with `-threads 1`. No parity is
-claimed: it is slower than the third-party decoder on 8-bit streams (an open
-defect) and far slower than ffmpeg.
+claimed: it is far slower than ffmpeg, an open defect.
 
-| stream (1080p) | v0.18.0 | v0.19.0 | third-party | ffmpeg |
-| --- | --- | --- | --- | --- |
-| alien, Main | 58.2 | 76.1 | 87.4 | 395 |
-| fade, Main | 53.8 | 68.8 | 80.0 | 430 |
-| alien, Main 10 | 60.1 | 79.3 | 30.0 | 303 |
-| alien8 | 66.6 | 85.6 | 95.3 | 429 |
+| stream (1080p) | v0.19.0 | v0.20.0 | third-party | ffmpeg | v0.20.0 / third-party | v0.20.0 / ffmpeg |
+| --- | --- | --- | --- | --- | --- | --- |
+| alien, Main | 75.9 | 91.2 | 87.2 | 392.6 | 1.05 | 0.23 |
+| fade, Main | 68.7 | 82.6 | 79.9 | 428.2 | 1.03 | 0.19 |
+| alien, Main 10 | 79.1 | 92.0 | 30.0 | 303.2 | 3.07 | 0.30 |
+| alien8 | 85.6 | 104.0 | 95.2 | 431.0 | 1.09 | 0.24 |
+
+`decode` v0.10.0 speed, `DecodeTrack` on the MP4 of four 1080p streams, frames per
+second of CPU time, median of 7 rounds, order reversed every other round, against
+ffmpeg 6.1.1 `-threads 1` (x86) and 9.0.2 (M4); "before" is decode v0.9.0 over
+gen2brain/h265. Source: the [decode README](https://github.com/go-avkit/decode#readme).
+The M4 rows are indicative (load 7.8 to 9.8).
+
+| 1080p, one core | decode (h265) | before (gen2brain) | ffmpeg | decode / ffmpeg | decode / before |
+| --- | --- | --- | --- | --- | --- |
+| x86, Ryzen 9 7950X, `taskset -c 5`, load 0.4 to 1.1: Main (240 frames) | 77.2 | 87.1 | 390.2 | 0.20 | 0.89 |
+| Main fade, weighted prediction (120) | 70.7 | 79.9 | 431.7 | 0.16 | 0.88 |
+| Main 10 (240) | 75.2 | 30.0 | 295.6 | 0.25 | 2.51 |
+| Main, second stream (240) | 88.9 | 95.5 | 430.9 | 0.21 | 0.93 |
+| M4 Max, indicative: Main (240) | 92.8 | 72.8 | 431.7 | 0.21 | 1.27 |
+| Main fade (120) | 99.2 | 67.6 | 485.8 | 0.20 | 1.47 |
+| Main 10 (240) | 87.6 | 31.4 | 125.1 | 0.70 | 2.79 |
+| Main, second stream (240) | 108.3 | 80.5 | 488.8 | 0.22 | 1.34 |
+
+**On x86 the 8-bit streams are 7 to 12 percent slower than before, an open defect
+([decode#101](https://github.com/go-avkit/decode/issues/101))**: h265 returns 16-bit
+planes and a `Frame` holds one byte a sample at 8 bits, so every frame is narrowed on
+the way out; the planned fix is native 8-bit planes in h265. Correctness against
+v0.9.0 on the 196 JCT-VC streams: 148 identical, 0 lost, 4 more decode; the 44 both
+refuse are 37 formats a `Frame` cannot carry and 7 using `cabac_bypass_alignment`.
 
 Part of the **Graphics, images & media** family of the
 [pure-Go ecosystem](https://go-desktop.github.io/) — 9 modules,
