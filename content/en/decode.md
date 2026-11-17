@@ -9,8 +9,12 @@ weight: 15
 (Main and Main 10, 4:2:0) to planar YUV and **FLAC**, **MP3**, **Opus**, since v0.6.0, [**AAC**](#aac) and, since v0.9.0, linear PCM (WAVE) to PCM, in pure Go with no cgo. Vorbis and MP2 are
 not decoded. H.264 is
 decoded by [`oops1/go.264`](https://github.com/oops1/go.264) (BSD-2-Clause),
-pinned and forced onto its software path; HEVC by
-[`gen2brain/h265`](https://github.com/gen2brain/h265) v0.2.4 (MIT). `decode` is
+pinned and forced onto its software path; HEVC, since v0.10.0, by our own
+[`h265`](https://github.com/go-avkit/h265) v0.21.0 (it was gen2brain/h265 up to
+v0.9.0; that dependency is gone, and a format a `Frame` cannot carry is refused at the
+SPS with an `ErrUnsupported` that names it). Speed is on the
+[home page]({{< relref "_index.md" >}}): on x86 the 8-bit streams are 7 to 12 %
+slower than v0.9.0, an open defect (decode#101). `decode` is
 the avkit-facing layer around them and the place where claims are measured. It
 is the only module in this organisation that produces pictures or sound.
 
@@ -221,7 +225,8 @@ Measured on decode v0.3.0, single core, on an Apple M4 Max with ffmpeg 9.0.2
 | HEVC Main 10 2160p, real clip | 10.3 | 27.9 | 0.37 |
 | committed H.264 and HEVC streams | | | 0.21 to 0.41 |
 
-The profiles put the hot spots mostly in the wrapped libraries: `go.264` has no
-arm64 assembly kernels, and `gen2brain/h265` takes its assembly motion compensation
-at 8 bits only. The measurement is on arm64; an amd64 one is still needed. The audio
+This table is the v0.3.0 measurement, when HEVC ran on gen2brain/h265; the HEVC speed
+since v0.10.0 is on the home page. The profiles put the hot spots mostly in the wrapped
+libraries: `go.264` has no arm64 assembly kernels, and gen2brain/h265 took its assembly
+motion compensation at 8 bits only. The measurement is on arm64; an amd64 one is still needed. The audio
 decoders are not measured yet.
