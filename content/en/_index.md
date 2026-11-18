@@ -47,7 +47,10 @@ Zen 4 core, against v0.21.0, alien Main 91.1 to 107.6 fps (+18 %), fade Main 82.
 (indicative) +1 to +8 %. **Behaviour change in v0.22.0:** `Plane.Pix` is renamed
 `Pix16`, with no alias, and an 8-bit picture carries `Pix8 []uint8` instead (exactly
 one of the two is non-nil; `Is8`, `At` and `Len` read either). `decode` v0.11.0
-uses it.
+uses it. v0.23.0 decodes the 7 JCT-VC RExt streams that use
+`cabac_bypass_alignment_enabled_flag` (all 31 of their picture hashes match) and the
+base layer of the 9 MV-HEVC conformance streams (md5 of the shipped base-layer YUV on
+371 pictures); speed is not re-measured. `decode` v0.11.0 still refuses the 7 streams.
 **Behaviour change in v0.19.0:** the planes of a picture from `Decoder.Output` are
 read-only views, not copies, and `Stride` can exceed `Width`; a caller that modifies
 samples must call `Clone()` first. Since `decode` v0.10.0, `decode` decodes HEVC with
