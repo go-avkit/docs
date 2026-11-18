@@ -97,6 +97,13 @@ Main 1.23 and 1.10, fade 1.20 and 1.06, second Main 1.22 and 1.14, Main 10 1.00 
 v0.9.0. The picture md5 equals ffmpeg's. Correctness against v0.9.0 on the 196 JCT-VC streams: 148 identical, 0 lost, 4 more decode; the 44 both
 refuse are 37 formats a `Frame` cannot carry and 7 using `cabac_bypass_alignment`.
 
+**H.264 speed:** `decode` v0.12.0 moves to
+[`h264`](https://github.com/go-avkit/h264) v0.11.0 (API unchanged), which runs more of
+go-videodsp/kernels (AVX2 on amd64). Through `DecodeTrack`, one core, 1080p, Apple M4
+(indicative, load 9 to 11: ratios hold, times do not): alien 5.7 to 5.9 s to 2.3 s, fade
+(explicit weights) 2.0 s to 0.8 s, 2.5 times faster; ffmpeg is still 2.3 to 2.8 times
+faster, an open defect. Zen 4 is not re-measured.
+
 Part of the **Graphics, images & media** family of the
 [pure-Go ecosystem](https://go-desktop.github.io/) — 9 modules,
 all `CGO_ENABLED=0`.
