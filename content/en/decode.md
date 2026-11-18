@@ -10,11 +10,11 @@ weight: 15
 not decoded. H.264 is
 decoded by [`oops1/go.264`](https://github.com/oops1/go.264) (BSD-2-Clause),
 pinned and forced onto its software path; HEVC, since v0.10.0, by our own
-[`h265`](https://github.com/go-avkit/h265) v0.21.0 (it was gen2brain/h265 up to
+[`h265`](https://github.com/go-avkit/h265) v0.22.0 since v0.11.0 (it was gen2brain/h265 up to
 v0.9.0; that dependency is gone, and a format a `Frame` cannot carry is refused at the
 SPS with an `ErrUnsupported` that names it). Speed is on the
-[home page]({{< relref "_index.md" >}}): on x86 the 8-bit streams are 7 to 12 %
-slower than v0.9.0, an open defect (decode#101). `decode` is
+[home page]({{< relref "_index.md" >}}): v0.10.0's x86 8-bit slowdown
+(decode#101) is closed, and no stream is slower than v0.9.0 since v0.11.0. `decode` is
 the avkit-facing layer around them and the place where claims are measured. It
 is the only module in this organisation that produces pictures or sound.
 

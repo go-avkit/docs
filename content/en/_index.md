@@ -46,13 +46,14 @@ Zen 4 core, against v0.21.0, alien Main 91.1 to 107.6 fps (+18 %), fade Main 82.
 95.3 (+16 %), alien8 103.9 to 125.7 (+21 %), Main 10 unchanged; on an Apple M4
 (indicative) +1 to +8 %. **Behaviour change in v0.22.0:** `Plane.Pix` is renamed
 `Pix16`, with no alias, and an 8-bit picture carries `Pix8 []uint8` instead (exactly
-one of the two is non-nil; `Is8`, `At` and `Len` read either). `decode` still pins
-v0.21.0.
+one of the two is non-nil; `Is8`, `At` and `Len` read either). `decode` v0.11.0
+uses it.
 **Behaviour change in v0.19.0:** the planes of a picture from `Decoder.Output` are
 read-only views, not copies, and `Stride` can exceed `Width`; a caller that modifies
 samples must call `Clone()` first. Since `decode` v0.10.0, `decode` decodes HEVC with
-`h265` (gen2brain/h265 is gone); on x86 its 8-bit streams are 7 to 12 % slower than
-v0.9.0, an open defect (decode#101), and Main 10 is 2.5 times faster. Nothing
+`h265` (gen2brain/h265 is gone); v0.10.0 was 7 to 12 % slower than v0.9.0 on x86
+8-bit streams, and since v0.11.0 no stream is slower than v0.9.0 (Main 10 is 2.5
+times faster). Nothing
 here decodes sound except `decode`'s FLAC, MP3, Opus and, since decode v0.6.0,
 AAC-LC and HE-AAC v1 and, since v0.7.0, HE-AAC v2 (full profile since v0.8.0; not Vorbis or MP2).
 
@@ -87,11 +88,13 @@ The M4 rows are indicative (load 7.8 to 9.8).
 | Main 10 (240) | 87.6 | 31.4 | 125.1 | 0.70 | 2.79 |
 | Main, second stream (240) | 108.3 | 80.5 | 488.8 | 0.22 | 1.34 |
 
-**On x86 the 8-bit streams are 7 to 12 percent slower than before, an open defect
-([decode#101](https://github.com/go-avkit/decode/issues/101))**: h265 returns 16-bit
-planes and a `Frame` holds one byte a sample at 8 bits, so every frame is narrowed on
-the way out; the planned fix is native 8-bit planes in h265. Correctness against
-v0.9.0 on the 196 JCT-VC streams: 148 identical, 0 lost, 4 more decode; the 44 both
+The table above is v0.10.0, where the x86 8-bit streams were 7 to 12 percent slower
+than v0.9.0 because every 16-bit h265 frame was narrowed on the way out (decode#101,
+closed). **`decode` v0.11.0** moves to h265 v0.22.0, which decodes 8-bit pictures into
+bytes: through `DecodeTrack` on Zen 4 (pinned core), against v0.10.0 and against v0.9.0,
+Main 1.23 and 1.10, fade 1.20 and 1.06, second Main 1.22 and 1.14, Main 10 1.00 and
+2.51; on an Apple M4 (indicative) 1.00 to 1.10 against v0.10.0 and 1.43 to 2.84 against
+v0.9.0. The picture md5 equals ffmpeg's. Correctness against v0.9.0 on the 196 JCT-VC streams: 148 identical, 0 lost, 4 more decode; the 44 both
 refuse are 37 formats a `Frame` cannot carry and 7 using `cabac_bypass_alignment`.
 
 Part of the **Graphics, images & media** family of the
