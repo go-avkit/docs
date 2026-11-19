@@ -50,7 +50,7 @@ one of the two is non-nil; `Is8`, `At` and `Len` read either). `decode` v0.11.0
 uses it. v0.23.0 decodes the 7 JCT-VC RExt streams that use
 `cabac_bypass_alignment_enabled_flag` (all 31 of their picture hashes match) and the
 base layer of the 9 MV-HEVC conformance streams (md5 of the shipped base-layer YUV on
-371 pictures); speed is not re-measured. `decode` v0.11.0 still refuses the 7 streams.
+371 pictures); speed is not re-measured. `decode` v0.13.0 (h265 v0.23.0) decodes 1 of the 7 streams and 6 are refused (4:4:4 with 16-bit samples, a format a `Frame` cannot carry), and decodes the MV-HEVC base layer (md5 equal to the shipped `_0.yuv`).
 **Behaviour change in v0.19.0:** the planes of a picture from `Decoder.Output` are
 read-only views, not copies, and `Stride` can exceed `Width`; a caller that modifies
 samples must call `Clone()` first. Since `decode` v0.10.0, `decode` decodes HEVC with
@@ -97,8 +97,8 @@ closed). **`decode` v0.11.0** moves to h265 v0.22.0, which decodes 8-bit picture
 bytes: through `DecodeTrack` on Zen 4 (pinned core), against v0.10.0 and against v0.9.0,
 Main 1.23 and 1.10, fade 1.20 and 1.06, second Main 1.22 and 1.14, Main 10 1.00 and
 2.51; on an Apple M4 (indicative) 1.00 to 1.10 against v0.10.0 and 1.43 to 2.84 against
-v0.9.0. The picture md5 equals ffmpeg's. Correctness against v0.9.0 on the 196 JCT-VC streams: 148 identical, 0 lost, 4 more decode; the 44 both
-refuse are 37 formats a `Frame` cannot carry and 7 using `cabac_bypass_alignment`.
+v0.9.0. The picture md5 equals ffmpeg's. Correctness against v0.9.0 on the 196 JCT-VC streams: 148 identical, 0 lost, 4 more decode (v0.10.0); against v0.12.0, `decode` v0.13.0 gives 152 identical, 0 lost, 1 more
+(`WPP_AND_TILE_AND_CABAC_BYPASS_ALIGN_1_HIGH_TP_444_14BIT_RExt_Apple_2`) and 43 refused by both.
 
 **H.264 speed:** `decode` v0.12.0 moves to
 [`h264`](https://github.com/go-avkit/h264) v0.11.0 (API unchanged), which runs more of
