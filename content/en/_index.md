@@ -51,6 +51,15 @@ uses it. v0.23.0 decodes the 7 JCT-VC RExt streams that use
 `cabac_bypass_alignment_enabled_flag` (all 31 of their picture hashes match) and the
 base layer of the 9 MV-HEVC conformance streams (md5 of the shipped base-layer YUV on
 371 pictures); speed is not re-measured. `decode` v0.13.0 (h265 v0.23.0) decodes 1 of the 7 streams and 6 are refused (4:4:4 with 16-bit samples, a format a `Frame` cannot carry), and decodes the MV-HEVC base layer (md5 equal to the shipped `_0.yuv`).
+v0.24.0 adds an opt-in reuse of pictures: with `Options.RecyclePictures` set, a caller
+that is done with a picture calls `(*DecodedPicture).Release()` and the decoder reuses
+its planes once the decoded picture buffer no longer references it. The default is
+unchanged (every picture is its own allocation, never reused); a picture that is not
+released is never reused, and releasing twice, or with the option off, does nothing.
+`h265.Decoder` alone, one pinned Zen 4 core, option off to on: alien Main 104.2 to
+113.9 fps (+9 %), fade Main 93.2 to 101.2 (+8 %), alien Main 10 89.2 to 100.3 (+12 %),
+alien8 121.1 to 124.9 (+3 %), with 3 to 5 times fewer page faults per frame. The
+output is unchanged on all 196 JCT-VC conformance streams.
 **Behaviour change in v0.19.0:** the planes of a picture from `Decoder.Output` are
 read-only views, not copies, and `Stride` can exceed `Width`; a caller that modifies
 samples must call `Clone()` first. Since `decode` v0.10.0, `decode` decodes HEVC with
