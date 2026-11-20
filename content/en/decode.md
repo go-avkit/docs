@@ -28,6 +28,27 @@ for _, f := range frames { // display order
 }
 ```
 
+Since v0.14.0, `decode.Frames` is the streaming form of `DecodeTrack`, for H.264 and
+HEVC, with the same edit-list and timestamp handling:
+
+```go
+for f, err := range decode.Frames(r, trackID, decode.Config{}) {
+    if err != nil {
+        return err
+    }
+    use(f)
+}
+```
+
+It returns an `iter.Seq2[*Frame, error]`. Each `*Frame` is a fresh allocation the
+caller owns, so it can be kept or sent to another goroutine; leaving the loop (`break`,
+`return`) stops the decoding; an error is the last pair, after every picture decoded
+before it. On the 15 files of the edit-list corpus it yields exactly `DecodeTrack`'s
+pictures, and both equal ffmpeg's md5. A caller that uses each frame and lets it go
+saves the slice: on Zen 4, one core, `Frames` against `DecodeTrack`, H.264 alien 2.63 s
+to 2.53 s (-4 %) with page faults 194 000 to 25 000, fade 1.05 s to 1.00 s (-5 %), HEVC
+alien-main 2.66 s to 2.47 s (-7 %).
+
 - **H.264 input:** an `avcC` record (`decode.NewAVCC`) or a `TrackConfig`
   (`decode.NewTrack`) with length-prefixed samples, fed with `DecodeSample` and
   ended with `Flush`; or a raw Annex B stream (`decode.New`, `DecodeAnnexB`).
