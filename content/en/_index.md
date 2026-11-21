@@ -31,7 +31,7 @@ manifest. There is no licence logic and no key server, and the content key
 itself never enters `media`. It
 also reads the H.264, H.265, VP8 and VP9 bitstream syntax. Only
 [`decode`]({{< relref "decode.md" >}}) turns samples into pictures, for H.264 and
-for HEVC Main and Main 10 (4:2:0), within the limits that page states. `h265`
+for HEVC in 4:0:0, 4:2:0, 4:2:2 and 4:4:4 at 8 to 16 bits (4:2:0 at 8 and 10 bits before `decode` v0.15.0), within the limits that page states. `h265`
 carries a decoder of our own since v0.14.0 and reconstructs inter prediction
 since v0.15.0: 7147 hashed conformance pictures verified (6638 inter), 0
 mismatched; the 3091 pictures of the 59 hashless streams are unverified
@@ -60,6 +60,14 @@ released is never reused, and releasing twice, or with the option off, does noth
 113.9 fps (+9 %), fade Main 93.2 to 101.2 (+8 %), alien Main 10 89.2 to 100.3 (+12 %),
 alien8 121.1 to 124.9 (+3 %), with 3 to 5 times fewer page faults per frame. The
 output is unchanged on all 196 JCT-VC conformance streams.
+**Behaviour change in `decode` v0.15.0:** HEVC in 4:0:0, 4:2:2 and 4:4:4, at 8 to 16 bits
+with luma and chroma depths that may differ, now decodes by default (until v0.14.0 only
+4:2:0 at 8 or 10 bits did). A caller must read `Frame.Chroma`, `BitDepth` and `BitDepthC`
+(`SampleBytes(plane)` and `ChromaSize()` help); the 47 JCT-VC range-extension streams the
+test can run match the suite's md5. Still refused: separate colour planes, and a frame of
+more than 2³¹−1 bytes (`ErrOverLimit`). `decode` v0.15.0 also uses h265 v0.24.0 (picture
+reuse, 5 to 8 % faster through `Frames` and `DecodeTrack` on Zen 4) and h264 v0.12.0 (2.2
+to 2.7 % faster); decode#108, a 32-bit overflow, is fixed.
 **Behaviour change in v0.19.0:** the planes of a picture from `Decoder.Output` are
 read-only views, not copies, and `Stride` can exceed `Width`; a caller that modifies
 samples must call `Clone()` first. Since `decode` v0.10.0, `decode` decodes HEVC with
