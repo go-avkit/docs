@@ -6,13 +6,13 @@ weight: 15
 # decode {#decode}
 
 `github.com/go-avkit/decode` decodes **H.264** and **HEVC / H.265**
-(Main and Main 10, 4:2:0) to planar YUV and **FLAC**, **MP3**, **Opus**, since v0.6.0, [**AAC**](#aac) and, since v0.9.0, linear PCM (WAVE) to PCM, in pure Go with no cgo. Vorbis and MP2 are
+(4:0:0, 4:2:0, 4:2:2 and 4:4:4 at 8 to 16 bits since v0.15.0; 4:2:0 at 8 and 10 bits before) to planar YUV and **FLAC**, **MP3**, **Opus**, since v0.6.0, [**AAC**](#aac) and, since v0.9.0, linear PCM (WAVE) to PCM, in pure Go with no cgo. Vorbis and MP2 are
 not decoded. H.264 is
 decoded by [`oops1/go.264`](https://github.com/oops1/go.264) (BSD-2-Clause),
 pinned and forced onto its software path; HEVC, since v0.10.0, by our own
 [`h265`](https://github.com/go-avkit/h265) v0.22.0 since v0.11.0 (it was gen2brain/h265 up to
-v0.9.0; that dependency is gone, and a format a `Frame` cannot carry is refused at the
-SPS with an `ErrUnsupported` that names it). Speed is on the
+v0.9.0; that dependency is gone; until v0.14.0 a format a `Frame` could not carry was refused at the
+SPS with an `ErrUnsupported` that names it, and since v0.15.0 only separate colour planes are). Speed is on the
 [home page]({{< relref "_index.md" >}}): v0.10.0's x86 8-bit slowdown
 (decode#101) is closed, and no stream is slower than v0.9.0 since v0.11.0. `decode` is
 the avkit-facing layer around them and the place where claims are measured. It
@@ -49,6 +49,16 @@ saves the slice: on Zen 4, one core, `Frames` against `DecodeTrack`, H.264 alien
 to 2.53 s (-4 %) with page faults 194 000 to 25 000, fade 1.05 s to 1.00 s (-5 %), HEVC
 alien-main 2.66 s to 2.47 s (-7 %).
 
+Since v0.15.0, `decode` uses h265 v0.24.0 and releases each picture to it once it is
+converted to a `Frame`, so the decoder reuses the planes; the output is unchanged. Zen 4,
+one core, 7 ABBA rounds, median of 14 runs per side, against v0.14.0 (this measures that
+change alone): alien-main `Frames` 2.401 s to 2.213 s (-7.8 %), `DecodeTrack` 2.580 s to
+2.444 s (-5.3 %); fade-main `Frames` 1.358 s to 1.261 s (-7.2 %), `DecodeTrack` 1.461 s to
+1.386 s (-5.1 %); minor page faults per frame on alien-main `Frames` 1437 to 283. H.264
+runs on h264 v0.12.0 (a store-forwarding stall removed), 2.2 to 2.7 % faster on Zen 4:
+alien 2.561 s to 2.491 s, fade 1.034 s to 1.011 s; ffmpeg 6.1.1 is still about 2.5 times
+faster on H.264.
+
 - **H.264 input:** an `avcC` record (`decode.NewAVCC`) or a `TrackConfig`
   (`decode.NewTrack`) with length-prefixed samples, fed with `DecodeSample` and
   ended with `Flush`; or a raw Annex B stream (`decode.New`, `DecodeAnnexB`).
@@ -58,6 +68,14 @@ alien-main 2.66 s to 2.47 s (-7 %).
   hold little-endian 16-bit samples.
 - **Output:** frames in display order, with planes, strides, size, chroma
   format, bit depth and PTS.
+  **Behaviour change in v0.15.0:** a `Frame` may now be 4:0:0, 4:2:0, 4:2:2 or 4:4:4,
+  at 8 to 16 bits, with luma and chroma depths that differ. Read `Frame.Chroma`,
+  `BitDepth` and `BitDepthC` rather than assuming 4:2:0:
+  `(Frame).SampleBytes(plane)` gives the bytes per sample of a plane (1 at 8 bits,
+  otherwise 2, a little-endian 16-bit word) and `(Frame).ChromaSize()` the size of the
+  chroma planes. A 4:0:0 frame has no `Cb` or `Cr`, and its `BitDepthC` is 0. Frames
+  are bounded by their bytes, computed without overflow, so the same limit applies on
+  every platform (decode#108, a 32-bit overflow, is fixed).
 
 ### One picture {#poster-frame}
 
@@ -199,7 +217,9 @@ conditions.
 | H.264 High 10, 4:2:2, 4:4:4, lossless | refused with `ErrUnsupported` |
 | HEVC Main, Main Still Picture, 4:2:0 8-bit | bit-exact against ffmpeg |
 | HEVC Main 10, 4:2:0 10-bit | bit-exact against ffmpeg |
-| HEVC other chroma formats, other bit depths, unequal luma and chroma depths | refused with `ErrUnsupported` |
+| HEVC 4:0:0, 4:2:2 and 4:4:4, 8 to 16 bits, luma and chroma depths that differ (since v0.15.0, on by default) | the 47 JCT-VC range-extension streams the test can run match the suite's md5 |
+| HEVC 4:4:4 coded as separate colour planes | refused with `ErrUnsupported` |
+| HEVC frame of more than 2³¹−1 bytes | refused with `ErrOverLimit` |
 
 ## How it was measured {#measured}
 
@@ -215,8 +235,12 @@ Every picture's MD5 is compared with ffmpeg's `-f framemd5`, single thread.
   ffmpeg disagrees with it and `decode` agrees with it (`SAODBLK_A_MainConcept_4`,
   `SAODBLK_B_MainConcept_4`, `VPSSPSPPS_A_MainConcept_1`). One,
   `TSUNEQBD_A_MAIN10_Technicolor_2` (luma and chroma bit depths differ), is
-  refused by `decode` and by ffmpeg. The bitstreams are not in the repository,
+  refused by ffmpeg; since v0.15.0 `decode` decodes it to the suite's MD5. The
+  bitstreams are not in the repository,
   so the conformance test runs only when pointed at them.
+- **JCT-VC range extensions (since v0.15.0):** all 47 streams the test can run
+  decode to the suite's md5, including `Bitdepth_A`, `Bitdepth_B` and `TSUNEQBD`
+  (10-bit luma, 9-bit chroma).
 - **Streams and real files in the repository:** 29 H.264 and 5 HEVC streams run
   in CI against ffmpeg's MD5s; real MP4 and Matroska files (5 H.264, 7 HEVC) are
   recorded as hashes.
