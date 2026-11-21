@@ -69,7 +69,9 @@ more than 2³¹−1 bytes (`ErrOverLimit`). `decode` v0.15.0 also uses h265 v0.2
 reuse, 5 to 8 % faster through `Frames` and `DecodeTrack` on Zen 4) and h264 v0.12.0 (2.2
 to 2.7 % faster); decode#108, a 32-bit overflow, is fixed. `decode` v0.15.1 uses h264
 v0.13.0: H.264 decoding is 3.3 to 3.6 % faster on Zen 4 (alien 2.266 to 2.185 s, fade
-0.881 to 0.852 s, from the h264 notes).
+0.881 to 0.852 s, from the h264 notes). `decode` v0.15.2 uses h264 v0.14.0: 5.9 % faster
+on alien (2.207 to 2.076 s) and 3.5 % on fade (0.849 to 0.819 s) on Zen 4; ffmpeg is still
+2.07 times faster on alien and 2.28 times on fade.
 **Behaviour change in v0.19.0:** the planes of a picture from `Decoder.Output` are
 read-only views, not copies, and `Stride` can exceed `Width`; a caller that modifies
 samples must call `Clone()` first. Since `decode` v0.10.0, `decode` decodes HEVC with
