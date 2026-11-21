@@ -56,9 +56,11 @@ change alone): alien-main `Frames` 2.401 s to 2.213 s (-7.8 %), `DecodeTrack` 2.
 2.444 s (-5.3 %); fade-main `Frames` 1.358 s to 1.261 s (-7.2 %), `DecodeTrack` 1.461 s to
 1.386 s (-5.1 %); minor page faults per frame on alien-main `Frames` 1437 to 283. H.264
 runs on h264 v0.12.0 (a store-forwarding stall removed), 2.2 to 2.7 % faster on Zen 4:
-alien 2.561 s to 2.491 s, fade 1.034 s to 1.011 s; ffmpeg 6.1.1 is still about 2.5 times
-faster on H.264. Since v0.15.1, `decode` uses h264 v0.13.0: H.264 decoding is 3.3 to 3.6 %
-faster on Zen 4 (alien 2.266 s to 2.185 s, fade 0.881 s to 0.852 s, from the h264 notes).
+alien 2.561 s to 2.491 s, fade 1.034 s to 1.011 s. Since v0.15.1, `decode` uses h264
+v0.13.0: H.264 decoding is 3.3 to 3.6 % faster on Zen 4 (alien 2.266 s to 2.185 s, fade
+0.881 s to 0.852 s, from the h264 notes). Since v0.15.2, it uses h264 v0.14.0: 5.9 % faster
+on alien (2.207 s to 2.076 s) and 3.5 % on fade (0.849 s to 0.819 s) on Zen 4; ffmpeg 6.1.1
+is still faster on H.264, 2.07 times on alien and 2.28 times on fade.
 
 - **H.264 input:** an `avcC` record (`decode.NewAVCC`) or a `TrackConfig`
   (`decode.NewTrack`) with length-prefixed samples, fed with `DecodeSample` and
