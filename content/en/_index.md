@@ -74,7 +74,8 @@ on alien (2.207 to 2.076 s) and 3.5 % on fade (0.849 to 0.819 s) on Zen 4; ffmpe
 2.07 times faster on alien and 2.28 times on fade. `decode` v0.15.3 uses h264 v0.15.0
 (CABAC residual decoding in one assembly kernel call, output identical to v0.14.0): alien
 2.051 to 2.025 s (1.3 %) on Zen 4, ffmpeg about 2.02 times faster on alien (2.025 s
-against 1.004 s).
+against 1.004 s). `decode` v0.16.1 runs the SBR filter banks of HE-AAC v2 in float32:
+699 to 670 ms (-4.2 %) on a short clip, one Zen 4 core, 1.59 to 1.52 times ffmpeg.
 **Behaviour change in v0.19.0:** the planes of a picture from `Decoder.Output` are
 read-only views, not copies, and `Stride` can exceed `Width`; a caller that modifies
 samples must call `Clone()` first. Since `decode` v0.10.0, `decode` decodes HEVC with
