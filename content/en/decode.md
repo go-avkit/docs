@@ -98,7 +98,7 @@ f, err := decode.PosterFrame(r, id, 12.5, decode.PosterConfig{})
 presentation time at or before `t`, the very bytes `DecodeTrack` returns for it,
 without decoding the whole track: decoding starts at the last sync sample at or
 before the picture's sample and stops as soon as the picture is out. It takes
-H.264 (`avc1`, `avc3`) and HEVC (`hvc1`, `hev1`); another codec (VP8, VP9, AV1, ...) is refused by name, since v0.9.0,
+H.264 (`avc1`, `avc3`), HEVC (`hvc1`, `hev1`), VP8 (`vp08`) and VP9 (`vp09`, since v0.16.0); another codec (AV1, ...) is refused by name, since v0.9.0,
 with a `*CodecError` (`codec "vp09" is not supported`; `errors.Is(err,
 ErrUnsupported)` holds), not reported as a corrupt sample. A negative or NaN `t` is `ErrTime`.
 
@@ -221,6 +221,11 @@ conditions.
 
 ## What it decodes {#what-it-decodes}
 
+VP8 and VP9 run faster when the program is built with `GOEXPERIMENT=simd` (Go 1.27, amd64 AVX2
+or arm64): govpx's native-SIMD kernels are compiled only then, and a library cannot set it for
+its importers. On one core that is 2.07x to 4.96x. How to build and the measurements are in the
+[decode README](https://github.com/go-avkit/decode#building-with-simd).
+
 | Codec and profile | State |
 | --- | --- |
 | H.264 Constrained Baseline; Baseline without FMO/ASO | bit-exact |
@@ -228,6 +233,8 @@ conditions.
 | H.264 High, 4:2:0 8-bit, progressive | bit-exact on the streams measured; no JVT FRExt stream measured yet |
 | H.264 interlaced (PAFF, MBAFF), FMO/ASO, Extended | refused with `ErrUnsupported` |
 | H.264 High 10, 4:2:2, 4:4:4, lossless | refused with `ErrUnsupported` |
+| VP8, and VP9 profile 0 (8-bit 4:2:0), since v0.16.0, over [`thesyncim/govpx`](https://github.com/thesyncim/govpx) | libvpx's decoder test vectors match on every picture (all 62 VP8, 271 of the 303 VP9 profile 0; 32 fail in govpx itself) |
+| VP9 profiles 1 to 3 (4:4:4, 4:2:2, 4:4:0, 10 and 12 bits) | refused with `ErrUnsupported` naming the profile |
 | HEVC Main, Main Still Picture, 4:2:0 8-bit | bit-exact against ffmpeg |
 | HEVC Main 10, 4:2:0 10-bit | bit-exact against ffmpeg |
 | HEVC 4:0:0, 4:2:2 and 4:4:4, 8 to 16 bits, luma and chroma depths that differ (since v0.15.0, on by default) | the 47 JCT-VC range-extension streams the test can run match the suite's md5 |
