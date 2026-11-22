@@ -64,7 +64,10 @@ on alien (2.207 s to 2.076 s) and 3.5 % on fade (0.849 s to 0.819 s) on Zen 4; f
 is still faster on H.264, 2.07 times on alien and 2.28 times on fade. Since v0.15.3, it
 uses h264 v0.15.0 (CABAC residual decoding in one assembly kernel call, output identical to
 v0.14.0 under a differential fuzz test): alien 2.051 s to 2.025 s (1.3 %) on Zen 4; ffmpeg
-is about 2.02 times faster on alien (2.025 s against 1.004 s).
+is about 2.02 times faster on alien (2.025 s against 1.004 s). Since v0.16.1, the SBR
+filter banks of HE-AAC v2 run in float32 (go-simd/floats v0.33.0): 699 ms to 670 ms (-4.2 %)
+on a short clip, one Zen 4 core; the PCM is no longer bit identical across CPU routes and is
+held to stated error bounds instead.
 
 - **H.264 input:** an `avcC` record (`decode.NewAVCC`) or a `TrackConfig`
   (`decode.NewTrack`) with length-prefixed samples, fed with `DecodeSample` and
@@ -194,11 +197,14 @@ interleaved rounds at 1-minute load 6.02 to 6.46:
 | 5.1, 48 kHz | 793.4 | 821 | 0.966 |
 | stereo, 48 kHz | 309.0 | 472 | 0.655 |
 
-**HE-AAC v2 is slower than ffmpeg on one core: about 1.6 times its `utime` on
+**HE-AAC v2 is slower than ffmpeg on one core: about 1.5 times its `utime` on
 an x86 server core and about 1.1 times on an Apple M4**, an open defect
-([go-avkit/decode#77](https://github.com/go-avkit/decode/issues/77)). Same
+([go-avkit/decode#77](https://github.com/go-avkit/decode/issues/77)). Since
+v0.16.1 the SBR filter banks run in float32: 699 ms to 670 ms (-4.2 %) on
+Zen 4 for a short parametric-stereo clip, 1.59 to 1.52 times ffmpeg. Same
 method, a 620 s HE-AAC v2 file, as measured for v0.8.0 (Go 1.27.4, interleaved
-rounds, one row per machine):
+rounds, one row per machine; the Zen 4 row below is the v0.16.0 measurement,
+the M4 row was not repeated):
 
 | Machine, date | decode / ffmpeg | 1-minute load | ffmpeg |
 | --- | --- | --- | --- |
