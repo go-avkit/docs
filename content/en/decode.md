@@ -8,8 +8,9 @@ weight: 15
 `github.com/go-avkit/decode` decodes **H.264** and **HEVC / H.265**
 (4:0:0, 4:2:0, 4:2:2 and 4:4:4 at 8 to 16 bits since v0.15.0; 4:2:0 at 8 and 10 bits before) to planar YUV and **FLAC**, **MP3**, **Opus**, since v0.6.0, [**AAC**](#aac) and, since v0.9.0, linear PCM (WAVE) to PCM, in pure Go with no cgo. Vorbis and MP2 are
 not decoded. H.264 is
-decoded by [`oops1/go.264`](https://github.com/oops1/go.264) (BSD-2-Clause),
-pinned and forced onto its software path; HEVC, since v0.10.0, by our own
+decoded by our own [`h264`](https://github.com/go-avkit/h264), whose decoding layer
+began as [`oops1/go.264`](https://github.com/oops1/go.264) v1.12.0 (BSD-2-Clause) and
+which has run the H.264 path since v0.12.0; HEVC, since v0.10.0, by our own
 [`h265`](https://github.com/go-avkit/h265) v0.22.0 since v0.11.0 (it was gen2brain/h265 up to
 v0.9.0; that dependency is gone; until v0.14.0 a format a `Frame` could not carry was refused at the
 SPS with an `ErrUnsupported` that names it, and since v0.15.0 only separate colour planes are). Speed is on the
@@ -231,11 +232,12 @@ conditions.
 
 Every picture's MD5 is compared with ffmpeg's `-f framemd5`, single thread.
 
-- **ITU-T H.264.1 conformance suite (AVCv1):** 81 streams tried, 73 give the same
-  pictures as ffmpeg. 69 do with `go.264` v1.12.0 as pinned; 4 more
-  (`MR2` to `MR5_TANDBERG`) only with the upstream fix
-  [oops1/go.264#2](https://github.com/oops1/go.264/pull/2), which is merged
-  upstream and not yet in a release. The other 8 are not claimed: 5 interlaced and 3 using FMO/ASO.
+- **ITU-T H.264.1 conformance suite (AVCv1):** 81 streams tried, 73 are claimed.
+  Measured on `h264` (whose decoding layer comes from `go.264` v1.12.0), 69 give the
+  same pictures as ffmpeg today, as h264's README also states (69 of its 73
+  streams); 4 more (`MR2` to `MR5_TANDBERG`) need MMCO 5 and frame_num gaps
+  ([oops1/go.264#2](https://github.com/oops1/go.264/pull/2)) and are skipped until
+  h264 carries the fix. The other 8 are not claimed: 5 interlaced and 3 using FMO/ASO.
 - **JCT-VC conformance suite HEVC_v1 (ITU-T H.265.1):** 147 streams. 143 give the
   same pictures as ffmpeg. Three are decided by the suite's own MD5 because
   ffmpeg disagrees with it and `decode` agrees with it (`SAODBLK_A_MainConcept_4`,
@@ -278,6 +280,6 @@ Measured on decode v0.3.0, single core, on an Apple M4 Max with ffmpeg 9.0.2
 
 This table is the v0.3.0 measurement, when HEVC ran on gen2brain/h265; the HEVC speed
 since v0.10.0 is on the home page. The profiles put the hot spots mostly in the wrapped
-libraries: `go.264` has no arm64 assembly kernels, and gen2brain/h265 took its assembly
+libraries: the old `go.264` wrapper had no arm64 assembly kernels (`h264` has them), and gen2brain/h265 took its assembly
 motion compensation at 8 bits only. The measurement is on arm64; an amd64 one is still needed. The audio
 decoders are not measured yet.
