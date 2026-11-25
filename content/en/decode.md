@@ -67,7 +67,9 @@ v0.14.0 under a differential fuzz test): alien 2.051 s to 2.025 s (1.3 %) on Zen
 is about 2.02 times faster on alien (2.025 s against 1.004 s). Since v0.16.1, the SBR
 filter banks of HE-AAC v2 run in float32 (go-simd/floats v0.33.0): 699 ms to 670 ms (-4.2 %)
 on a short clip, one Zen 4 core; the PCM is no longer bit identical across CPU routes and is
-held to stated error bounds instead.
+held to stated error bounds instead. Since v0.17.1, the parametric-stereo all-pass plan is
+driven by tick (go-simd/floats v0.41.0, `AllPass3Plan.RunTick`): `BenchmarkPSDecode/ps` 2053
+us to 2044 us (-0.45 %, within a noise of about 0.3 %), output unchanged.
 
 - **H.264 input:** an `avcC` record (`decode.NewAVCC`) or a `TrackConfig`
   (`decode.NewTrack`) with length-prefixed samples, fed with `DecodeSample` and
@@ -201,7 +203,8 @@ interleaved rounds at 1-minute load 6.02 to 6.46:
 an x86 server core and about 1.1 times on an Apple M4**, an open defect
 ([go-avkit/decode#77](https://github.com/go-avkit/decode/issues/77)). Since
 v0.16.1 the SBR filter banks run in float32: 699 ms to 670 ms (-4.2 %) on
-Zen 4 for a short parametric-stereo clip, 1.59 to 1.52 times ffmpeg. Same
+Zen 4 for a short parametric-stereo clip, 1.59 to 1.52 times ffmpeg; v0.17.1 drives the parametric-stereo all-pass plan by tick
+(2053 to 2044 us, -0.45 %, marginal), and the ratio against ffmpeg was not re-measured for it. Same
 method, a 620 s HE-AAC v2 file, as measured for v0.8.0 (Go 1.27.4, interleaved
 rounds, one row per machine; the Zen 4 row below is the v0.16.0 measurement,
 the M4 row was not repeated):

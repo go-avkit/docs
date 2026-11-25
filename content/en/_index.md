@@ -75,7 +75,9 @@ on alien (2.207 to 2.076 s) and 3.5 % on fade (0.849 to 0.819 s) on Zen 4; ffmpe
 (CABAC residual decoding in one assembly kernel call, output identical to v0.14.0): alien
 2.051 to 2.025 s (1.3 %) on Zen 4, ffmpeg about 2.02 times faster on alien (2.025 s
 against 1.004 s). `decode` v0.16.1 runs the SBR filter banks of HE-AAC v2 in float32:
-699 to 670 ms (-4.2 %) on a short clip, one Zen 4 core, 1.59 to 1.52 times ffmpeg.
+699 to 670 ms (-4.2 %) on a short clip, one Zen 4 core, 1.59 to 1.52 times ffmpeg. `decode` v0.17.1 drives the parametric-stereo all-pass plan
+by tick (go-simd/floats v0.41.0): 2053 to 2044 us (-0.45 %, within a 0.3 % noise) on that
+benchmark; the ratio against ffmpeg was not re-measured for v0.17.1.
 **Behaviour change in v0.19.0:** the planes of a picture from `Decoder.Output` are
 read-only views, not copies, and `Stride` can exceed `Width`; a caller that modifies
 samples must call `Clone()` first. Since `decode` v0.10.0, `decode` decodes HEVC with
