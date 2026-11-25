@@ -98,7 +98,7 @@ f, err := decode.PosterFrame(r, id, 12.5, decode.PosterConfig{})
 presentation time at or before `t`, the very bytes `DecodeTrack` returns for it,
 without decoding the whole track: decoding starts at the last sync sample at or
 before the picture's sample and stops as soon as the picture is out. It takes
-H.264 (`avc1`, `avc3`), HEVC (`hvc1`, `hev1`), VP8 (`vp08`) and VP9 (`vp09`, since v0.16.0); another codec (AV1, ...) is refused by name, since v0.9.0,
+H.264 (`avc1`, `avc3`), HEVC (`hvc1`, `hev1`), VP8 (`vp08`) and VP9 (`vp09`, since v0.16.0; profiles 1 to 3 since v0.17.0); another codec (AV1, ...) is refused by name, since v0.9.0,
 with a `*CodecError` (`codec "vp09" is not supported`; `errors.Is(err,
 ErrUnsupported)` holds), not reported as a corrupt sample. A negative or NaN `t` is `ErrTime`.
 
@@ -233,8 +233,8 @@ its importers. On one core that is 2.07x to 4.96x. How to build and the measurem
 | H.264 High, 4:2:0 8-bit, progressive | bit-exact on the streams measured; no JVT FRExt stream measured yet |
 | H.264 interlaced (PAFF, MBAFF), FMO/ASO, Extended | refused with `ErrUnsupported` |
 | H.264 High 10, 4:2:2, 4:4:4, lossless | refused with `ErrUnsupported` |
-| VP8, and VP9 profile 0 (8-bit 4:2:0), since v0.16.0, over [`thesyncim/govpx`](https://github.com/thesyncim/govpx) | libvpx's decoder test vectors match on every picture (all 62 VP8, 271 of the 303 VP9 profile 0; 32 fail in govpx itself) |
-| VP9 profiles 1 to 3 (4:4:4, 4:2:2, 4:4:0, 10 and 12 bits) | refused with `ErrUnsupported` naming the profile |
+| VP8 since v0.16.0, and VP9 profiles 0 to 3 (4:2:0, 4:2:2, 4:4:4, 8, 10 and 12 bits) since v0.17.0, over [`thesyncim/govpx`](https://github.com/thesyncim/govpx) v0.3.1 | libvpx's decoder test vectors match on every picture: 373 of 376 (all 62 VP8, 311 of 314 VP9), none differs, with and without `GOEXPERIMENT=simd`; the test fails on any differing vector |
+| VP9 4:4:0 (`yuv440` vectors) | refused with `ErrUnsupported` naming 4:4:0 (`Frame` has no such sampling); 3 of the 376 vectors |
 | HEVC Main, Main Still Picture, 4:2:0 8-bit | bit-exact against ffmpeg |
 | HEVC Main 10, 4:2:0 10-bit | bit-exact against ffmpeg |
 | HEVC 4:0:0, 4:2:2 and 4:4:4, 8 to 16 bits, luma and chroma depths that differ (since v0.15.0, on by default) | the 47 JCT-VC range-extension streams the test can run match the suite's md5 |
