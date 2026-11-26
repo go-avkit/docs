@@ -236,7 +236,7 @@ its importers. On one core that is 2.07x to 4.96x. How to build and the measurem
 | H.264 High, 4:2:0 8-bit, progressive | bit-exact on the streams measured; no JVT FRExt stream measured yet |
 | H.264 interlaced (PAFF, MBAFF), FMO/ASO, Extended | refused with `ErrUnsupported` |
 | H.264 High 10, 4:2:2, 4:4:4, lossless | refused with `ErrUnsupported` |
-| VP8 since v0.16.0, and VP9 profiles 0 to 3 (4:2:0, 4:2:2, 4:4:4, 8, 10 and 12 bits) since v0.17.0, over [`thesyncim/govpx`](https://github.com/thesyncim/govpx) v0.3.1 | libvpx's decoder test vectors match on every picture: 373 of 376 (all 62 VP8, 311 of 314 VP9), none differs, with and without `GOEXPERIMENT=simd`; the test fails on any differing vector |
+| VP8 since v0.16.0, and VP9 profiles 0 to 3 (4:2:0, 4:2:2, 4:4:4, 8, 10 and 12 bits) since v0.17.0, over [`thesyncim/govpx`](https://github.com/thesyncim/govpx) v0.5.2 | libvpx's decoder test vectors match on every picture: 373 of 376 (all 62 VP8, 311 of 314 VP9), none differs, with and without `GOEXPERIMENT=simd`; the test fails on any differing vector |
 | VP9 4:4:0 (`yuv440` vectors) | refused with `ErrUnsupported` naming 4:4:0 (`Frame` has no such sampling); 3 of the 376 vectors |
 | HEVC Main, Main Still Picture, 4:2:0 8-bit | bit-exact against ffmpeg |
 | HEVC Main 10, 4:2:0 10-bit | bit-exact against ffmpeg |
