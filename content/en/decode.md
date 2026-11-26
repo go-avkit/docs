@@ -14,7 +14,7 @@ which has run the H.264 path since v0.12.0; HEVC, since v0.10.0, by our own
 [`h265`](https://github.com/go-avkit/h265) v0.22.0 since v0.11.0 (it was gen2brain/h265 up to
 v0.9.0; that dependency is gone; until v0.14.0 a format a `Frame` could not carry was refused at the
 SPS with an `ErrUnsupported` that names it, and since v0.15.0 only separate colour planes are). Speed is on the
-[home page]({{< relref "_index.md" >}}): v0.10.0's x86 8-bit slowdown
+[history page]({{< relref "history.md" >}}): v0.10.0's x86 8-bit slowdown
 (decode#101) is closed, and no stream is slower than v0.9.0 since v0.11.0. `decode` is
 the avkit-facing layer around them and the place where claims are measured. It
 is the only module in this organisation that produces pictures or sound.
@@ -295,7 +295,7 @@ Measured on decode v0.3.0, single core, on an Apple M4 Max with ffmpeg 9.0.2
 | committed H.264 and HEVC streams | | | 0.21 to 0.41 |
 
 This table is the v0.3.0 measurement, when HEVC ran on gen2brain/h265; the HEVC speed
-since v0.10.0 is on the home page. The profiles put the hot spots mostly in the wrapped
+since v0.10.0 is on the history page. The profiles put the hot spots mostly in the wrapped
 libraries: the old `go.264` wrapper had no arm64 assembly kernels (`h264` has them), and gen2brain/h265 took its assembly
 motion compensation at 8 bits only. The measurement is on arm64; an amd64 one is still needed. The audio
 decoders are not measured yet.
