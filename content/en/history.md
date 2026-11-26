@@ -138,3 +138,18 @@ go-videodsp/kernels (AVX2 on amd64). Through `DecodeTrack`, one core, 1080p, App
 (explicit weights) 2.0 s to 0.8 s, 2.5 times faster; ffmpeg is still 2.3 to 2.8 times
 faster, an open defect. Zen 4 is not re-measured.
 
+## Verification of the bitstream modules {#verification}
+
+Where another implementation can answer the same question, it is asked: the `h264`
+reference picture set against `ffmpeg -debug mmco` (3110 reference pictures across 101
+streams, zero disagreements), its reference lists against an independent pure-Go decoder
+(785 lists, 18 streams, zero disagreements), and the implicit bi-prediction weights over
+all 65536 pairs the clause clips to. `bitstream`, `h264`, `boolcoder`, `vp8` and `vp9`
+produce no pixels: no residual entropy decoding, transform, motion compensation or
+deblocking. `h265` reconstructs pictures since v0.14.0 (intra) and v0.15.0 (inter, with
+deblocking and SAO), and `decode` uses it for HEVC since v0.10.0.
+
+`h265` v0.14.0 also changes `Unit.TemporalID`, which returned TemporalId + 2 up to
+v0.13.2 and now returns TemporalId. Since v0.14.0 `decode.Frames(r, trackID, cfg)` streams
+one picture at a time (an `iter.Seq2[*Frame, error]`, each Frame owned by the caller).
+
