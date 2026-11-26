@@ -204,7 +204,7 @@ an x86 server core and about 1.1 times on an Apple M4**, an open defect
 ([go-avkit/decode#77](https://github.com/go-avkit/decode/issues/77)). Since
 v0.16.1 the SBR filter banks run in float32: 699 ms to 670 ms (-4.2 %) on
 Zen 4 for a short parametric-stereo clip, 1.59 to 1.52 times ffmpeg; v0.17.1 drives the parametric-stereo all-pass plan by tick
-(2053 to 2044 us, -0.45 %, marginal), and the ratio against ffmpeg was not re-measured for it. Same
+(2053 to 2044 us, -0.45 %, marginal), and the whole decode is now measured at 1.42 times ffmpeg's user time (2026-11-25, Zen 4, one pinned core, load about 1, 9 interleaved rounds, `ps4-he2.mp4`: decode 643 ms median, ffmpeg 6.1.1 with one thread 453 ms user plus 209 ms system, 659 ms real; the system time is not paid by our in-process benchmark, so user time is the comparable figure; 1.74 when decode#77 opened). Same
 method, a 620 s HE-AAC v2 file, as measured for v0.8.0 (Go 1.27.4, interleaved
 rounds, one row per machine; the Zen 4 row below is the v0.16.0 measurement,
 the M4 row was not repeated):

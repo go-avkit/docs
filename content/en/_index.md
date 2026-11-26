@@ -77,7 +77,7 @@ on alien (2.207 to 2.076 s) and 3.5 % on fade (0.849 to 0.819 s) on Zen 4; ffmpe
 against 1.004 s). `decode` v0.16.1 runs the SBR filter banks of HE-AAC v2 in float32:
 699 to 670 ms (-4.2 %) on a short clip, one Zen 4 core, 1.59 to 1.52 times ffmpeg. `decode` v0.17.1 drives the parametric-stereo all-pass plan
 by tick (go-simd/floats v0.41.0): 2053 to 2044 us (-0.45 %, within a 0.3 % noise) on that
-benchmark; the ratio against ffmpeg was not re-measured for v0.17.1.
+benchmark. Measured on 2026-11-25 (Zen 4, one pinned core, load about 1, 9 interleaved rounds, ffmpeg 6.1.1 with one thread): HE-AAC v2 decodes at 1.42 times ffmpeg's user time (was 1.74 when decode#77 opened); ffmpeg's real time also holds 209 ms of system time that our in-process benchmark does not pay, so user time is the comparable figure.
 **Behaviour change in v0.19.0:** the planes of a picture from `Decoder.Output` are
 read-only views, not copies, and `Stride` can exceed `Width`; a caller that modifies
 samples must call `Clone()` first. Since `decode` v0.10.0, `decode` decodes HEVC with
