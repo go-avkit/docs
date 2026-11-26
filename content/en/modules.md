@@ -53,7 +53,7 @@ The landing page gives each module one line; the detail is here.
   boundaries, and since v0.14.0 an HEVC decoder of our own. All 52215 conformance slices
   walk to their last bit; 509 of 509 hashed intra pictures match their decoded picture
   hash SEI (v0.14.0); 7147 hashed pictures, 6638 of them inter, 0 mismatched (v0.15.0).
-  Speed and the per-version changes are on the [home page]({{< relref "_index.md" >}}).
+  Speed and the per-version changes are on the [history page]({{< relref "history.md" >}}).
 - **`boolcoder`**: the boolean arithmetic decoder VP8 and VP9 read their compressed
   partitions with.
 - **`vp8`**: the VP8 frame tag and key-frame header, the parts of a frame that are plain
