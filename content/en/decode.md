@@ -229,6 +229,29 @@ or arm64): govpx's native-SIMD kernels are compiled only then, and a library can
 its importers. On one core that is 2.07x to 4.96x. How to build and the measurements are in the
 [decode README](https://github.com/go-avkit/decode#building-with-simd).
 
+**Threads (v0.18.0).** `Config.Threads` sets how many goroutines decode one VP8 or VP9 stream;
+the default is 1, the serial decoder, and the pictures are the same for every value (libvpx's
+373 matching vectors also match with 4 threads). Measured on a Ryzen 9 7950X pinned to 8 cores,
+300 frames of 1080p `testsrc2`, 5 interleaved rounds, microseconds per picture:
+
+| clip | 1 thread | 2 | 4 | 8 |
+| --- | --- | --- | --- | --- |
+| VP9, 4 tiles | 3928 | 2687 (1.46x) | 2101 (1.87x) | 2173 (1.81x) |
+| VP9, 1 tile | 3730 | 2713 (1.38x) | 2457 (1.52x) | 2450 (1.52x) |
+| VP8 | 2874 | 2008 (1.43x) | 2011 (1.43x) | 2010 (1.43x) |
+
+More than 4 threads buys nothing on these clips. The clips are synthetic, and arm64 was not
+measured.
+
+**Recycle (v0.19.0).** `(*Decoder).Recycle(f)` is an opt-in that hands a `Frame`'s planes back
+so that a later `DecodeSample` writes into them instead of allocating. The ownership rule: after
+`Recycle(f)` the caller must not read or write `f.Y`, `f.Cb` or `f.Cr`, nor those of a copy of
+`f`, and calls it once per `Frame`. A decoder whose `Recycle` is never called behaves as before;
+it is a no-op for H.264 and HEVC. On one thread it saved 7.0 % to 8.7 % of the time per picture
+and cut the allocation of the 300-frame clips from about 955 MB to 20 to 25 MB. Threads and
+`Recycle` can be used together (the decode test runs 4 threads with `Recycle`; their combined
+speed was not measured).
+
 | Codec and profile | State |
 | --- | --- |
 | H.264 Constrained Baseline; Baseline without FMO/ASO | bit-exact |
